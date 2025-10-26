@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lunar Maze", "Lunar Maze.vcxproj", "{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Debug|x64.ActiveCfg = Debug|x64
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Debug|x64.Build.0 = Debug|x64
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Debug|x86.ActiveCfg = Debug|Win32
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Debug|x86.Build.0 = Debug|Win32
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Release|x64.ActiveCfg = Release|x64
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Release|x64.Build.0 = Release|x64
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Release|x86.ActiveCfg = Release|Win32
+		{194DEECB-44D6-4DA4-B6BD-8050FBB5F699}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD8F54F2-5A9C-4171-88E7-FD5E3DC1CC7B}
+	EndGlobalSection
+EndGlobal
