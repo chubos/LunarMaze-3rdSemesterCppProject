@@ -6,7 +6,7 @@ Enemy::Enemy(const std::string& texturePath, sf::Vector2f startPosition, float s
 	changeDirection();
 }
 
-void Enemy::update(float dt)
+void Enemy::update(float dt, Map* map)
 {
 	changeDirectionTimer += dt;
 	if (changeDirectionTimer > 2.f) {
@@ -14,7 +14,7 @@ void Enemy::update(float dt)
 		changeDirectionTimer = 0.f;
 	}
 	position += direction * dt;
-	sprite.setPosition(position);
+	setPosition(position);
 }
 
 void Enemy::changeDirection()

@@ -9,7 +9,7 @@ class Enemy : public Character
 public:
 	Enemy(const std::string& texturePath, sf::Vector2f startPosition, float speed);
 
-	void update(float dt) override;
+	void update(float dt, Map* map) override;
 	void changeDirection();
 };
 
