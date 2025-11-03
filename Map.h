@@ -21,7 +21,7 @@ public:
 	bool isWallAt(float x, float y) const;
 
 	bool isWallCollision(sf::FloatRect bounds) const;
-	void collectCrystalAt(sf::FloatRect bounds);
+	bool collectCrystalAt(sf::FloatRect bounds);
 	int getScore() const;
 	
 	float getTileSize() const { return tileSize; }

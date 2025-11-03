@@ -48,5 +48,5 @@ void Player::update(float dt, Map* map)
 		setPosition(position);
 	}
 
-	if (map) map->collectCrystalAt(getBounds());
+	// Collection handled by Game::update (so sound can be played there)
 }

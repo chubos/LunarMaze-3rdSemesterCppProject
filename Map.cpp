@@ -58,14 +58,16 @@ bool Map::isWallCollision(sf::FloatRect bounds) const
 	return false;
 }
 
-void Map::collectCrystalAt(sf::FloatRect bounds)
+bool Map::collectCrystalAt(sf::FloatRect bounds)
 {
 	for (auto& tile : tiles) {
 		if (tile.getType() == TileType::Crystal && !tile.isCollected() && tile.getBounds().intersects(bounds)) {
 			tile.collect();
 			score += 10;
+			return true;
 		}
 	}
+	return false;
 }
 
 int Map::getScore() const

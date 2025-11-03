@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <memory>
 #include "Player.h"
@@ -25,7 +26,21 @@ class Game {
 	sf::Text titleText;
 	sf::Text instructionText;
 
+	sf::Texture bgTexture1, bgTexture2;
+	sf::Sprite background1, background2;
+	float bg1Offset = 0.f;
+	float bg2Offset = 0.f;
+	float bg1Speed = 10.f;
+	float bg2Speed = 5.f;
+
+	sf::Music music;
+	sf::SoundBuffer collectBuffer, loseBuffer, winBuffer;
+	sf::Sound collectSound, loseSound, winSound;
+
 	GameState state = GameState::Menu;
+
+	float titleTime = 0.f;
+	float titlePulseSpeed = 2.f;
 
 public:
 	Game();

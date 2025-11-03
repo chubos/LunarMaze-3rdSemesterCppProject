@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 
 Game::Game() 
@@ -36,6 +37,49 @@ Game::Game()
 	statusText.setCharacterSize(40);
 	statusText.setFillColor(sf::Color::Yellow);
 	statusText.setPosition(200, 250);
+
+	bgTexture1.loadFromFile("assets/background1.png");
+	bgTexture2.loadFromFile("assets/background2.png");
+	background1.setTexture(bgTexture1);
+	background2.setTexture(bgTexture2);
+
+	background1.setScale(
+		window.getSize().x / background1.getGlobalBounds().width,
+		window.getSize().y / background1.getGlobalBounds().height
+	);
+	background2.setScale(
+		window.getSize().x / background2.getGlobalBounds().width,
+		window.getSize().y / background2.getGlobalBounds().height
+	);
+
+	if(!music.openFromFile("assets/music.ogg"))
+		std::cerr << "Failed to load background music\n";
+	else {
+		music.setLoop(true);
+		music.setVolume(40);
+		music.play();
+	}
+
+	// Load short sound buffers and attach to sounds; log on failure
+	if (!collectBuffer.loadFromFile("assets/collect.wav"))
+		std::cerr << "Failed to load collect.wav\n";
+	else
+		collectSound.setBuffer(collectBuffer);
+
+	if (!loseBuffer.loadFromFile("assets/lose.wav"))
+		std::cerr << "Failed to load lose.wav\n";
+	else
+		loseSound.setBuffer(loseBuffer);
+
+	if (!winBuffer.loadFromFile("assets/win.wav"))
+		std::cerr << "Failed to load win.wav\n";
+	else
+		winSound.setBuffer(winBuffer);
+
+	// Make sure sounds are audible relative to music
+	collectSound.setVolume(80.f);
+	loseSound.setVolume(80.f);
+	winSound.setVolume(80.f);
 }
 
 void Game::run() {
@@ -82,7 +126,26 @@ void Game::handleEvents()
 	}
 }
 void Game::update(float dt) {
+    bg1Offset += bg1Speed * dt;
+    bg2Offset += bg2Speed * dt;
+
+    background1.setPosition(0, std::fmod(bg1Offset, background1.getGlobalBounds().height) - background1.getGlobalBounds().height);
+    background2.setPosition(0,800 + std::fmod(bg2Offset, background2.getGlobalBounds().height) - background2.getGlobalBounds().height);
+
+    if (state == GameState::Menu) {
+        titleTime += dt * titlePulseSpeed;
+        float alpha = 200 + std::sin(titleTime) * 55;
+        titleText.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(alpha)));
+
+        instructionText.setPosition(220, 300 + std::sin(titleTime * 1.5f) * 5);
+        return;
+    }
+
+
 	player.update(dt, &map);
+
+	if (map.collectCrystalAt(player.getBounds()))
+		collectSound.play();
 
 	for (auto& enemy : enemies)
 		enemy->update(dt, nullptr);
@@ -92,6 +155,7 @@ void Game::update(float dt) {
 			state = GameState::GameOver;
 			statusText.setString("Game Over! You were caught! Press R to restart.");
 			statusText.setFillColor(sf::Color::Red);
+			loseSound.play();
 			return;
 		}
 	}
@@ -107,6 +171,7 @@ void Game::update(float dt) {
 		state = GameState::Win;
 		statusText.setString("You Win! All crystals collected! Press R to restart.");
 		statusText.setFillColor(sf::Color::Green);
+		winSound.play();
 	}
 	scoreText.setString("Score: " + std::to_string(map.getScore()));
 
@@ -114,6 +179,8 @@ void Game::update(float dt) {
 
 void Game::draw() {
 	window.clear();
+	window.draw(background2);
+	window.draw(background1);
 
 	if (state == GameState::Menu) {
 		window.draw(titleText);
