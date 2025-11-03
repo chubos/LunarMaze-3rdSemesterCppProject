@@ -26,12 +26,8 @@ class Game {
 	sf::Text titleText;
 	sf::Text instructionText;
 
-	sf::Texture bgTexture1, bgTexture2;
-	sf::Sprite background1, background2;
-	float bg1Offset = 0.f;
-	float bg2Offset = 0.f;
-	float bg1Speed = 10.f;
-	float bg2Speed = 5.f;
+	sf::Texture backgroundTexture;
+	sf::Sprite background;
 
 	sf::Music music;
 	sf::SoundBuffer collectBuffer, loseBuffer, winBuffer;
