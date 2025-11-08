@@ -16,7 +16,7 @@ void Character::scaleToTileSize(float tileSize)
 	auto texSize = texture.getSize();
 	if (texSize.x == 0 || texSize.y == 0) return;
 
-	const float marginFactor = 0.9f;
+	const float marginFactor = 0.96f;
 	float targetSize = tileSize * marginFactor;
 
 	float scaleX = targetSize / static_cast<float>(texSize.x);
@@ -36,9 +36,11 @@ void Character::scaleToTileSize(float tileSize)
 	sprite.setPosition(position + spriteOffset);
 }
 
-void Character::draw(sf::RenderWindow& window)
+void Character::draw(sf::RenderWindow& window, sf::Vector2f offset)
 {
-	window.draw(sprite);
+	sf::RenderStates states;
+	states.transform.translate(offset);
+	window.draw(sprite, states);
 }
 
 sf::Vector2f Character::getPosition() const

@@ -1,29 +1,15 @@
 #include "Enemy.h"
 
-Enemy::Enemy(const std::string& texturePath, sf::Vector2f startPosition, float speed)
-	: Character(texturePath, startPosition, speed)
+Enemy::Enemy(const std::string& texPath, sf::Vector2f startPos, float spd)
+    : Character(texPath, startPos, spd)
 {
-	changeDirection();
+    direction = { 1.f, 0.f };
+    changeDirTimer = 0.f;
 }
 
-void Enemy::update(float dt, Map* map)
+bool Enemy::canMoveTo(const Map& map, sf::Vector2f pos)
 {
-	changeDirectionTimer += dt;
-	if (changeDirectionTimer > 2.f) {
-		changeDirection();
-		changeDirectionTimer = 0.f;
-	}
-	position += direction * dt;
-	setPosition(position);
-}
-
-void Enemy::changeDirection()
-{
-	int d = rand() % 4;
-	switch (d) {
-	case 0: direction = { speed, 0 }; break;
-	case 1: direction = { -speed, 0 }; break;
-	case 2: direction = { 0, speed }; break;
-	case 3: direction = { 0, -speed }; break;
-	}
+    float tileSize = map.getTileSize();
+    sf::FloatRect next(pos.x, pos.y, tileSize, tileSize);
+    return !map.isWallCollision(next);
 }

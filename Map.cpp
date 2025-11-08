@@ -9,6 +9,8 @@ bool Map::loadFromFile(const std::string& filename) {
 		return false;
 	}
 
+	// Reset map state including score when loading
+	score = 0;
 	std::string line;
 	int y = 0;
 	tiles.clear();
@@ -30,9 +32,11 @@ bool Map::loadFromFile(const std::string& filename) {
 	return true;
 }
 
-void Map::draw(sf::RenderWindow& window) {
+void Map::draw(sf::RenderWindow& window, sf::Vector2f offset) {
+	sf::RenderStates states;
+	states.transform.translate(offset);
 	for (auto& tile : tiles)
-		tile.draw(window);
+		tile.draw(window, offset);
 }
 
 const std::vector<Tile>& Map::getTiles() const

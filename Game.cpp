@@ -1,17 +1,22 @@
 #include "Game.h"
+#include "Random.h"
+#include "Chaser.h"
+#include "Learner.h"
 #include <iostream>
 
 
 Game::Game() 
-	: window(sf::VideoMode(1500, 800), "Lunar Maze"),
-	player("assets/player.png", {100, 100}, 150.f)
+	: window(sf::VideoMode(1700, 900), "Lunar Maze"),
+	player("assets/player3.png", {100, 100}, 150.f)
 {
 	map.loadFromFile("assets/map2.txt");
 
 	player.scaleToTileSize(map.getTileSize());
 
-	enemies.push_back(std::make_unique<Enemy>("assets/drone.png", sf::Vector2f(400, 300), 100.f));
-	enemies.push_back(std::make_unique<Enemy>("assets/drone.png", sf::Vector2f(600, 200), 120.f));
+	enemies.push_back(std::make_unique<Random>("assets/ghost1.png", sf::Vector2f(300, 300), 100.f));
+	enemies.push_back(std::make_unique<Chaser>("assets/ghost2.png", sf::Vector2f(300, 300), 120.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(400, 500), 80.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost4.png", sf::Vector2f(600, 600), 80.f));
 	for (auto& enemy : enemies) enemy->scaleToTileSize(map.getTileSize());
 
 	font.loadFromFile("assets/font.ttf");
@@ -21,16 +26,16 @@ Game::Game()
 	scoreText.setPosition(10, 10);
 
 	titleText.setFont(font);
-	titleText.setCharacterSize(60);
+	titleText.setCharacterSize(120);
 	titleText.setFillColor(sf::Color::Cyan);
 	titleText.setString("Lunar Maze");
-	titleText.setPosition(160, 150);
+	titleText.setPosition(300, 150);
 
 	instructionText.setFont(font);
-	instructionText.setCharacterSize(24);
+	instructionText.setCharacterSize(30);
 	instructionText.setFillColor(sf::Color(200, 200, 255));
 	instructionText.setString("Collect all the crystals (*) while avoiding the drones!\nUse W/A/S/D to move your astronaut.");
-	instructionText.setPosition(220, 300);
+	instructionText.setPosition(260, 310);
 
 
 	statusText.setFont(font);
@@ -38,7 +43,7 @@ Game::Game()
 	statusText.setFillColor(sf::Color::Yellow);
 	statusText.setPosition(200, 250);
 
-	if (!backgroundTexture.loadFromFile("assets/background.png"))
+	if (!backgroundTexture.loadFromFile("assets/background5.png"))
 		std::cerr << "Nie mo¿na za³adowaæ t³a!\n";
 	background.setTexture(backgroundTexture);
 	background.setScale(
@@ -54,10 +59,28 @@ Game::Game()
 		music.play();
 	}
 
-	// Make sure sounds are audible relative to music
-	collectSound.setVolume(80.f);
-	loseSound.setVolume(80.f);
-	winSound.setVolume(80.f);
+	// Load short sound buffers and attach them to sounds
+	if (!collectBuffer.loadFromFile("assets/collect.wav"))
+		std::cerr << "Failed to load collect.wav\n";
+	else {
+		collectSound.setBuffer(collectBuffer);
+		collectSound.setVolume(60.f);
+	}
+
+	if (!loseBuffer.loadFromFile("assets/lose.wav"))
+		std::cerr << "Failed to load lose.wav\n";
+	else {
+		loseSound.setBuffer(loseBuffer);
+		loseSound.setVolume(60.f);
+	}
+
+	if (!winBuffer.loadFromFile("assets/win.wav"))
+		std::cerr << "Failed to load win.wav\n";
+	else {
+		winSound.setBuffer(winBuffer);
+		winSound.setVolume(60.f);
+	}
+
 }
 
 void Game::run() {
@@ -120,8 +143,8 @@ void Game::update(float dt) {
 	if (map.collectCrystalAt(player.getBounds()))
 		collectSound.play();
 
-	for (auto& enemy : enemies)
-		enemy->update(dt, nullptr);
+	for (auto& e : enemies)
+		e->update(dt, &map, player.getPosition());
 
 	for (auto& enemy : enemies) {
 		if (player.getBounds().intersects(enemy->getBounds())) {
@@ -154,21 +177,26 @@ void Game::draw() {
 	window.clear();
 	window.draw(background);
 
+	// compute offset to center map inside window
+	float mapPixelW = static_cast<float>(map.getWidth()) * map.getTileSize();
+	float mapPixelH = static_cast<float>(map.getHeight()) * map.getTileSize();
+	sf::Vector2f mapOffset((window.getSize().x - mapPixelW) * 0.5f, (window.getSize().y - mapPixelH) * 0.5f);
+
 	if (state == GameState::Menu) {
 		window.draw(titleText);
 		window.draw(instructionText);
 	}
 	else if (state == GameState::Playing) {
-		map.draw(window);
-		player.draw(window);
+		map.draw(window, mapOffset);
+		player.draw(window, mapOffset);
 		for (auto& enemy : enemies)
-			enemy->draw(window);
+			enemy->draw(window, mapOffset);
 		window.draw(scoreText);
 	}else if(state == GameState::GameOver || state == GameState::Win) {
-		map.draw(window);
-		player.draw(window);
+		map.draw(window, mapOffset);
+		player.draw(window, mapOffset);
 		for (auto& enemy : enemies)
-			enemy->draw(window);
+			enemy->draw(window, mapOffset);
 		window.draw(scoreText);
 		window.draw(statusText);
 	}
@@ -184,12 +212,14 @@ void Game::resetGame()
 	player.scaleToTileSize(map.getTileSize());
 
 	enemies.clear();
-	enemies.push_back(std::make_unique<Enemy>("assets/drone.png", sf::Vector2f(400, 300), 100.f));
-	enemies.push_back(std::make_unique<Enemy>("assets/drone.png", sf::Vector2f(600, 200), 120.f));
+	enemies.push_back(std::make_unique<Random>("assets/ghost1.png", sf::Vector2f(300, 300), 100.f));
+	enemies.push_back(std::make_unique<Chaser>("assets/ghost2.png", sf::Vector2f(300, 300), 120.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(400, 500), 80.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost4.png", sf::Vector2f(600, 600), 80.f));
 	for (auto& enemy : enemies) {
 		enemy->scaleToTileSize(map.getTileSize());
 		enemy->setPosition(enemy->getPosition());
 	}
 
-	state = GameState::Menu;
+	state = GameState::Playing;
 }

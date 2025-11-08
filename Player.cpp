@@ -22,7 +22,7 @@ void Player::handleInput()
 
 }
 
-void Player::update(float dt, Map* map)
+void Player::update(float dt, Map* map, std::optional<sf::Vector2f> /*playerPos*/)
 {
 	handleInput();
 

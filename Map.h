@@ -15,7 +15,8 @@ class Map
 public:
 	Map() = default;
 	bool loadFromFile(const std::string& filename);
-	void draw(sf::RenderWindow& window);
+	// draw with optional offset (pixels) to position map inside window
+	void draw(sf::RenderWindow& window, sf::Vector2f offset = {0.f, 0.f});
 
 	const std::vector<Tile>& getTiles() const;
 	bool isWallAt(float x, float y) const;
@@ -24,6 +25,9 @@ public:
 	bool collectCrystalAt(sf::FloatRect bounds);
 	int getScore() const;
 	
+	// Return tile size in pixels
 	float getTileSize() const { return tileSize; }
+	int getWidth() const { return width; }
+	int getHeight() const { return height; }
 };
 
