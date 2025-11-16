@@ -74,16 +74,16 @@ Game::Game()
 	scoreText.setPosition(20, 10);
 
 	titleText.setFont(font);
-	titleText.setCharacterSize(120);
+	titleText.setCharacterSize(150);
 	titleText.setFillColor(sf::Color::Cyan);
 	titleText.setString("Lunar Maze");
 	auto titleBounds = titleText.getLocalBounds();
 	titleText.setOrigin(titleBounds.left + titleBounds.width / 2.0f,
 		titleBounds.top + titleBounds.height / 2.0f);
-	titleText.setPosition(window.getSize().x / 2.0f, 300.f);
+	titleText.setPosition(window.getSize().x / 2.0f, 280.f);
 
 	instructionText.setFont(font);
-	instructionText.setCharacterSize(30);
+	instructionText.setCharacterSize(35);
 	instructionText.setFillColor(sf::Color(200, 200, 255));
 	instructionText.setString("Collect all the crystals while avoiding the ghosts!\n\t\t\t\tUse W/S/A/D to move your astronaut.");
 	auto instrBounds = instructionText.getLocalBounds();
@@ -239,11 +239,11 @@ void Game::run() {
 		titleTime += dt * titlePulseSpeed; // Aktualizacja czasu do efektu pulsowania kursora.
 
 		if (state == GameState::Menu) {
-			float alpha = 200 + std::sin(titleTime*1.5) * 50;
+			float alpha = 200.0f + std::sin(titleTime*1.5f) * 50.0f;
 			titleText.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(alpha)));
 
 			// Aktualizacja pozycji instrukcji (dla efektu lekkiego falowania)
-			instructionText.setPosition(window.getSize().x / 2.0f, 420.f + std::sin(titleTime * 1.5f) * 1.5);
+			instructionText.setPosition(window.getSize().x / 2.0f, 420.f + std::sin(titleTime * 1.5f) * 1.8f);
 		}
 
 		if (state == GameState::Playing)
