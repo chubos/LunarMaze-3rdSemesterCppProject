@@ -1,28 +1,19 @@
-#include "Chaser.h" // Do³¹czenie pliku nag³ówkowego klasy Chaser.
-#include <array> // Do³¹czenie nag³ówka dla std::array.
+#include "Chaser.h"
+#include <array>
 
-// ## Konstruktor klasy Chaser
-// Wywo³uje konstruktor klasy bazowej Enemy.
 Chaser::Chaser(const std::string& texPath, sf::Vector2f startPos, float spd)
 	: Enemy(texPath, startPos, spd)
 {
-	// Logika ruchu "Chaser" jest w pe³ni zaimplementowana w metodzie update.
 }
 
-// ## Metoda aktualizacji AI dla Chaser'a (Goni¹cego)
-// Implementuje AI, które polega na wyborze kierunku minimalizuj¹cego dystans do gracza.
-void Chaser::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
+void Chaser::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos) // Implementuje AI, które polega na wyborze kierunku minimalizuj¹cego dystans do gracza.
 {
-	// Zabezpieczenie: jeœli mapa lub pozycja gracza nie s¹ dostêpne, przerywamy.
-	if (!map || !playerPos.has_value()) return;
+	if (!map || !playerPos.has_value()) return; // Zabezpieczenie, jeœli mapa lub pozycja gracza nie s¹ dostêpne.
 
 	sf::Vector2f player = playerPos.value(); // Aktualna pozycja gracza.
 	sf::Vector2f bestDir = direction; // Zaczynamy od obecnego kierunku jako najlepszego.
 
-	// ===========================================
-	// 1. Rozwa¿amy tylko 4 kierunki osiowe (Góra, Dó³, Lewo, Prawo).
-	// ===========================================
-	std::array<sf::Vector2f, 4> dirs = {
+	std::array<sf::Vector2f, 4> dirs = { // 4 kierunki osiowe.
 		sf::Vector2f(1.f,  0.f),  // Prawo
 		sf::Vector2f(-1.f,  0.f),  // Lewo
 		sf::Vector2f(0.f,  1.f),  // Dó³
@@ -31,27 +22,19 @@ void Chaser::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
 
 	float bestDist = 999999.f; // Pocz¹tkowo bardzo du¿y dystans.
 
-	// =======================================================
-	// 2. Wybieramy kierunek, który zmniejsza dystans do gracza
-	//    i jest mo¿liwy do wykonania (nie koliduje ze œcian¹).
-	// =======================================================
-	for (auto& d : dirs)
+	for (auto& d : dirs) // Wybieramy kierunek, który zmniejsza dystans do gracza i nie koliduje ze œcian¹.
 	{
-		// Obliczenie potencjalnej nowej pozycji (np) po wykonaniu ruchu w kierunku 'd'.
-		sf::Vector2f np = position + d * speed * dt;
+		sf::Vector2f np = position + d * speed * dt; // Obliczenie potencjalnej nowej pozycji (np) po wykonaniu ruchu w kierunku 'd'.
 
-		// Pomijamy kierunki, które prowadz¹ do kolizji ze œcian¹.
-		if (!canMoveTo(*map, np))
+		if (!canMoveTo(*map, np)) // Pomijamy kierunki, które prowadz¹ do kolizji ze œcian¹.
 			continue;
 
-		// Obliczenie kwadratu dystansu euklidesowego do gracza z nowej pozycji.
-		// U¿ycie kwadratu dystansu (dist = dx*dx + dy*dy) jest szybsze ni¿ pierwiastek.
-		float dx = player.x - np.x;
+		float dx = player.x - np.x; // Obliczenie dystansu do gracza z nowej pozycji.
 		float dy = player.y - np.y;
 		float dist = dx * dx + dy * dy;
 
-		// Jeœli znaleziono lepszy (mniejszy) dystans:
-		if (dist < bestDist) {
+		
+		if (dist < bestDist) { // Jeœli znaleziono lepszy (mniejszy) dystans:
 			bestDist = dist; // Zapisujemy nowy minimalny dystans.
 			bestDir = d; // Zapisujemy ten kierunek jako najlepszy.
 		}
@@ -59,22 +42,15 @@ void Chaser::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
 
 	direction = bestDir; // Ustawienie wybranego kierunku ruchu.
 
-	// ===========================================
-	// 3. W³aœciwe wykonanie ruchu.
-	// ===========================================
-	sf::Vector2f newPos = position + direction * speed * dt;
+	sf::Vector2f newPos = position + direction * speed * dt; // Wykonanie ruchu.
 
-	// Sprawdzenie, czy ruch w wybranym kierunku jest mo¿liwy.
-	if (canMoveTo(*map, newPos)) {
+	if (canMoveTo(*map, newPos)) { // Sprawdzenie, czy ruch w wybranym kierunku jest mo¿liwy.
 		position = newPos; // Wykonanie ruchu.
 	}
 	else {
-		// Jeœli najlepszy ruch jest zablokowany (np. przez œcianê) –
-		// Awaryjne sprawdzenie pozosta³ych kierunków, aby unikn¹æ totalnego zatrzymania.
-		for (auto& d : dirs) {
+		for (auto& d : dirs) { // Jeœli najlepszy ruch jest zablokowany – awaryjne sprawdzenie pozosta³ych kierunków, aby unikn¹æ zatrzymania.
 			sf::Vector2f np = position + d * speed * dt;
-			// Jeœli inny ruch jest mo¿liwy, wybieramy go i przerywamy.
-			if (canMoveTo(*map, np)) {
+			if (canMoveTo(*map, np)) { // Jeœli inny ruch jest mo¿liwy, wybieramy go i przerywamy.
 				direction = d;
 				position = np;
 				break;
@@ -82,6 +58,5 @@ void Chaser::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
 		}
 	}
 
-	// Aktualizacja pozycji duszka (sprite) po zmianie logicznej pozycji.
-	setPosition(position);
+	setPosition(position); // Aktualizacja pozycji duszka.
 }

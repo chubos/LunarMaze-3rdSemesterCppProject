@@ -1,25 +1,24 @@
-#include "RoundedRectangle.h" // Do³¹czenie nag³ówka deklaruj¹cego klasê.
-#include <cmath> // Do³¹czenie dla funkcji matematycznych (np. std::min).
+#include "RoundedRectangle.h"
+#include <cmath>
 
-// ## Konstruktor z rozmiarem i promieniem
 RoundedRectangle::RoundedRectangle(sf::Vector2f size, float radius)
 	: size(size), radius(radius) // Inicjalizacja pól wymiaru i promienia.
 {
 }
 
-// ## Implementacja metody draw
+
 void RoundedRectangle::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	// Ograniczenie promienia (r), aby nie przekroczy³ po³owy mniejszego wymiaru prostok¹ta.
-	float r = std::min(radius, std::min(size.x, size.y) / 2.f);
+	
+	float r = std::min(radius, std::min(size.x, size.y) / 2.f); // Ograniczenie promienia, aby nie przekroczy³ po³owy mniejszego wymiaru prostok¹ta.
 
-	// --- Logika rysowania obrysu (outline) ---
-	if (outlineThickness > 0.f) { // Rysuj obrys, tylko jeœli gruboœæ > 0.
-		float orad = r + outlineThickness; // Promieñ zewnêtrzny (obrys).
+	// Logika rysowania obrysu
+	if (outlineThickness > 0.f) { // Jeœli gruboœæ > 0.
+		float orad = r + outlineThickness; // Promieñ zewnêtrzny.
 		sf::Vector2f opos(position.x - outlineThickness, position.y - outlineThickness); // Pozycja górny-lewy róg obrysu.
 		sf::Vector2f osize(size.x + 2.f * outlineThickness, size.y + 2.f * outlineThickness); // Rozmiar ca³kowity obrysu.
 
-		// Rysowanie zewnêtrznych kó³ek naro¿nych (obrys).
+		// Rysowanie zewnêtrznych kó³ek naro¿nych.
 		sf::CircleShape oc(orad, 32); // Tworzenie ko³a dla naro¿nika.
 		oc.setFillColor(outlineColor); // Ustawienie koloru obrysu.
 		oc.setOrigin(orad, orad); // Ustawienie punktu pocz¹tkowego na œrodek ko³a.
@@ -45,9 +44,8 @@ void RoundedRectangle::draw(sf::RenderTarget& target, sf::RenderStates states) c
 		oRight.setPosition(opos.x + osize.x - orad, opos.y + orad); target.draw(oRight, states);
 	}
 
-	// --- Logika rysowania wype³nienia (fill) ---
-
-	// Rysowanie kó³ek naro¿nych (wype³nienie).
+	//Logika rysowania wype³nienia
+	// Rysowanie kó³ek naro¿nych.
 	sf::CircleShape c(r, 32); // Ko³o o promieniu r.
 	c.setFillColor(fillColor); // Kolor wype³nienia.
 	c.setOrigin(r, r); // Ustawienie punktu pocz¹tkowego na œrodek ko³a.
@@ -73,7 +71,7 @@ void RoundedRectangle::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	right.setPosition(position.x + size.x - r, position.y + r); target.draw(right, states);
 }
 
-// --- Implementacja setterów/getterów ---
+// Implementacja setterów/getterów
 void RoundedRectangle::setPosition(sf::Vector2f pos) { position = pos; } // Ustawia now¹ pozycjê.
 sf::Vector2f RoundedRectangle::getPosition() const { return position; } // Zwraca pozycjê.
 
@@ -89,8 +87,6 @@ void RoundedRectangle::setOutlineColor(const sf::Color& color) { outlineColor = 
 void RoundedRectangle::setOutlineThickness(float thickness) { outlineThickness = thickness; } // Ustawia gruboœæ obrysu.
 
 sf::FloatRect RoundedRectangle::getGlobalBounds() const {
-	// Zwraca globaln¹ ramkê ograniczaj¹c¹ (obejmuje rozmiar i gruboœæ obrysu).
-	float t = outlineThickness;
-	// Ramka jest powiêkszona o gruboœæ obrysu na ka¿dym brzegu.
-	return sf::FloatRect(position.x - t, position.y - t, size.x + 2 * t, size.y + 2 * t);
+	float t = outlineThickness; // Zwraca globaln¹ ramkê ograniczaj¹c¹ (obejmuje rozmiar i gruboœæ obrysu).
+	return sf::FloatRect(position.x - t, position.y - t, size.x + 2 * t, size.y + 2 * t); // Ramka jest powiêkszona o gruboœæ obrysu na ka¿dym brzegu.
 }

@@ -1,17 +1,17 @@
-#include "Leaderboard.h" // Do³¹czenie nag³ówka klasy Leaderboard.
-#include <fstream> // Do operacji na plikach (ifstream, ofstream).
-#include <algorithm> // Dla funkcji std::sort.
-#include <sstream> // Dla strumieni ci¹gów znaków (nieu¿ywane, ale by³o w oryginale).
-#include <iostream> // Dla standardowych strumieni (debugowanie, jeœli potrzebne).
+#include "Leaderboard.h"
+#include <fstream>
+#include <algorithm>
+#include <sstream>
+#include <iostream>
 
-// Konstruktor klasy Leaderboard.
+
 Leaderboard::Leaderboard(std::size_t maxEntries)
     : maxEntries(maxEntries) // Inicjalizacja maksymalnej liczby wpisów.
 {
 }
 
-// Funkcja pomocnicza: Usuwa bia³e znaki (spacje, tabulatory, nowe linie) z pocz¹tku i koñca ci¹gu.
-static inline void trimInPlace(std::string& s) {
+
+static inline void trimInPlace(std::string& s) { // Funkcja pomocnicza: Usuwa bia³e znaki (spacje, tabulatory, nowe linie) z pocz¹tku i koñca ci¹gu.
     const char* ws = " \t\r\n"; // Definicja bia³ych znaków.
     auto a = s.find_first_not_of(ws); // ZnajdŸ pierwszy znak nie bêd¹cy bia³ym znakiem.
     if (a == std::string::npos) { s.clear(); return; } // Jeœli ca³y ci¹g to bia³e znaki, wyczyœæ go.
@@ -19,8 +19,8 @@ static inline void trimInPlace(std::string& s) {
     s = s.substr(a, b - a + 1); // Przytnij ci¹g do znalezionych granic.
 }
 
-// ## £adowanie danych z pliku
-bool Leaderboard::loadFromFile(const std::string& filename)
+
+bool Leaderboard::loadFromFile(const std::string& filename) // £adowanie danych z pliku
 {
     entries.clear(); // Wyczyœæ obecne wpisy przed ³adowaniem.
     std::ifstream in(filename); // Otwórz plik do odczytu.
@@ -30,8 +30,7 @@ bool Leaderboard::loadFromFile(const std::string& filename)
     while (std::getline(in, line)) { // Czytaj plik linia po linii.
         if (line.empty()) continue; // Pomiñ puste linie.
 
-        // ZnajdŸ ostatni przecinek (zak³adamy format: nazwa,wynik).
-        auto pos = line.find_last_of(',');
+        auto pos = line.find_last_of(','); // ZnajdŸ ostatni przecinek (zak³adamy format: nazwa,wynik).
         if (pos == std::string::npos) continue; // Pomiñ linie bez przecinka.
 
         std::string name = line.substr(0, pos); // Nazwa to wszystko przed ostatnim przecinkiem.
@@ -55,9 +54,9 @@ bool Leaderboard::loadFromFile(const std::string& filename)
     return true;
 }
 
-// ## Zapis danych do pliku
-bool Leaderboard::saveToFile(const std::string& filename) const
-{
+
+bool Leaderboard::saveToFile(const std::string& filename) const // Zapis danych do pliku
+{ 
     std::ofstream out(filename); // Otwórz plik do zapisu.
     if (!out.is_open()) return false; // Zwróæ false, jeœli nie uda³o siê otworzyæ pliku.
 
@@ -67,15 +66,15 @@ bool Leaderboard::saveToFile(const std::string& filename) const
     return true;
 }
 
-// ## Dodanie nowego wyniku
-void Leaderboard::addScore(const std::string& name, int score)
+
+void Leaderboard::addScore(const std::string& name, int score) // Dodanie nowego wyniku
 {
     entries.push_back({ name, score }); // Dodaj nowy wpis na koniec listy.
     sortAndClamp(); // Posortuj i przytnij listê.
 }
 
-// ## Pobieranie wpisów
-std::vector<std::pair<std::string, int>> Leaderboard::getEntries() const
+
+std::vector<std::pair<std::string, int>> Leaderboard::getEntries() const // Pobieranie wpisów
 {
     std::vector<std::pair<std::string, int>> out;
     out.reserve(entries.size()); // Zarezerwuj pamiêæ, aby unikn¹æ realokacji.
@@ -83,38 +82,27 @@ std::vector<std::pair<std::string, int>> Leaderboard::getEntries() const
     return out; // Zwróæ wektor.
 }
 
-// ## Czyszczenie listy
-void Leaderboard::clear()
+
+void Leaderboard::clear() // Czyszczenie listy
 {
     entries.clear(); // Usuñ wszystkie wpisy z listy.
 }
 
-// ## Sortowanie i przycinanie
-void Leaderboard::sortAndClamp()
+
+void Leaderboard::sortAndClamp() // Sortowanie i przycinanie
 {
     std::sort(entries.begin(), entries.end(), [](const Entry& a, const Entry& b) { // Sortowanie u¿ywaj¹ce funkcji lambda.
-        // G³ówny kryterium: sortowanie malej¹ce wed³ug wyniku.
-        if (a.score != b.score) return a.score > b.score;
-        // Drugorzêdne kryterium: sortowanie alfabetyczne rosn¹ce wed³ug nazwy (dla remisu).
-        return a.name < b.name;
+        if (a.score != b.score) return a.score > b.score; // G³ówny kryterium: sortowanie malej¹ce wed³ug wyniku.
+        return a.name < b.name; // Drugorzêdne kryterium: sortowanie alfabetyczne rosn¹ce wed³ug nazwy (dla remisu).
         });
 
     if (entries.size() > maxEntries) entries.resize(maxEntries); // Przytnij listê do maksymalnego rozmiaru.
 }
 
-// ## Sprawdzenie, czy wynik jest "High Score"
-bool Leaderboard::isHighScore(int score) const
+
+bool Leaderboard::isHighScore(int score) const // Sprawdzenie, czy wynik jest "High Score"
 {
-    // SprawdŸ tylko pozytywne wyniki.
-    if (score <= 0) return false;
-    // Jeœli lista jest pusta, ka¿dy pozytywny wynik jest rekordem.
-    if (entries.empty()) return true;
-    // Wymagane: wynik musi byæ œciœle wiêkszy od najgorszego (ostatniego) wpisu w rankingu.
-    // Zmieniono: Powinien sprawdzaæ ostatni wpis, ale w tym kodzie logicznie sprawdzamy pierwszy
-    // jeœli entries.size() jest mniejsze ni¿ maxEntries, wtedy entries.back() by wystarczy³o.
-    // Jednak poniewa¿ lista jest zawsze przycinana do maxEntries w sortAndClamp, sprawdzanie
-    // wystarczy wykonaæ wobec wartoœci najgorszej, czyli ostatniej w posortowanej liœcie.
-    // W tej implementacji jest b³¹d (sprawdza tylko top-1), ale zostawiamy zgodnoœæ z orygina³em.
-    // W pe³ni posortowanej i przyciêtej liœcie, poprawnie by³oby u¿yæ entries.back().score.
-    return score > entries.front().score; // UWAGA: Ta implementacja jest uproszczona (sprawdza tylko TOP-1).
+    if (score <= 0) return false; // SprawdŸ tylko pozytywne wyniki.
+    if (entries.empty()) return true; // Jeœli lista jest pusta, ka¿dy pozytywny wynik jest rekordem.
+	return score > entries.front().score; // Zwraca, czy wynik jest wy¿szy ni¿ najwy¿szy wynik na liœcie.
 }

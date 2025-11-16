@@ -1,13 +1,9 @@
-// Zapewnia, ¿e ten plik nag³ówkowy zostanie do³¹czony tylko raz.
 #pragma once
 #include <SFML/Graphics.hpp>
-// Umo¿liwia u¿ycie wartoœci opcjonalnych.
 #include <optional>
 
-// ZapowiedŸ klasy Map.
 class Map;
 
-// Klasa bazowa dla postaci w grze.
 class Character
 {
 protected:
@@ -15,27 +11,19 @@ protected:
 	sf::Texture texture; // Obraz postaci.
 	sf::Vector2f position; // Pozycja w œwiecie.
 	float speed; // Prêdkoœæ ruchu.
-	// Przesuniêcie dla wyœrodkowania duszka w kafelku.
-	sf::Vector2f spriteOffset{ 0.f, 0.f };
+	sf::Vector2f spriteOffset{ 0.f, 0.f }; // Przesuniêcie dla wyœrodkowania duszka w kafelku.
 
 public:
-	// Konstruktor.
+	
 	Character(const std::string& texturePath, sf::Vector2f startPosition, float speed);
-	// Wirtualny destruktor.
 	virtual ~Character() = default;
 
-	// Czysto wirtualna metoda aktualizacji stanu (logika ruchu/AI).
-	// dt = czas klatki; map = wskaŸnik do mapy; playerPos = opcjonalna pozycja gracza.
-	virtual void update(float dt, Map* map = nullptr, std::optional<sf::Vector2f> playerPos = std::nullopt) = 0;
-	// Wirtualna metoda rysowania.
-	virtual void draw(sf::RenderWindow& window, sf::Vector2f offset = { 0.f, 0.f });
+	virtual void update(float dt, Map* map = nullptr, std::optional<sf::Vector2f> playerPos = std::nullopt) = 0; // Czysto wirtualna metoda aktualizacji stanu (logika ruchu/AI).
+	virtual void draw(sf::RenderWindow& window, sf::Vector2f offset = { 0.f, 0.f }); // Wirtualna metoda rysowania.
 
-	// Skaluje duszka do rozmiaru kafelka mapy.
-	void scaleToTileSize(float tileSize);
-
+	void scaleToTileSize(float tileSize); // Skaluje duszka do rozmiaru kafelka mapy.
 	sf::Vector2f getPosition() const;
-	// Zwraca ramkê kolizyjn¹.
-	sf::FloatRect getBounds() const;
+	sf::FloatRect getBounds() const; // Zwraca ramkê kolizyjn¹.
 	void setPosition(sf::Vector2f newPosition);
 
 };

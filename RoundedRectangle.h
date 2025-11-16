@@ -1,8 +1,7 @@
-#pragma once // Zapewnia, ¿e ten plik nag³ówkowy zostanie do³¹czony tylko raz.
-#include <SFML/Graphics.hpp> // Do³¹czenie biblioteki SFML dla elementów graficznych.
-#include <algorithm> // Dla std::min (u¿ywanego do ograniczenia promienia).
+#pragma once
+#include <SFML/Graphics.hpp>
+#include <algorithm>
 
-// Klasa do rysowania prostok¹ta z zaokr¹glonymi rogami, dziedzicz¹ca po sf::Drawable.
 class RoundedRectangle : public sf::Drawable
 {
 private:
@@ -13,18 +12,13 @@ private:
 	sf::Color outlineColor = sf::Color::White; // Kolor obrysu (domyœlnie bia³y).
 	sf::Vector2f position = { 0.f, 0.f }; // Pozycja górnego lewego rogu.
 
-	// Wewnêtrzna implementacja rysowania, wymagana przez sf::Drawable.
-	// W tej metodzie odbywa siê ca³a z³o¿ona logika rysowania kó³ i prostok¹tów.
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override; // Wewnêtrzna implementacja rysowania, wymagana przez sf::Drawable - odbywa siê w niej ca³a z³o¿ona logika rysowania kó³ i prostok¹tów.
 
 public:
-	// Konstruktor: przyjmuje rozmiar (sf::Vector2f) i promieñ (float).
-	// Umo¿liwia to inicjalizacjê obiektu w liœcie inicjalizacyjnej Game.
-	RoundedRectangle(sf::Vector2f size, float radius);
+	RoundedRectangle(sf::Vector2f size, float radius); // Konstruktor: przyjmuje rozmiar (sf::Vector2f) i promieñ (float).
 
-	// Metody dostêpowe (settery i gettery)
 	void setPosition(sf::Vector2f pos); // Ustawia pozycjê górnego lewego rogu.
-	sf::Vector2f getPosition() const; // Zwraca aktualn¹ pozycjê (u¿ywane np. do pozycjonowania tekstu).
+	sf::Vector2f getPosition() const; // Zwraca aktualn¹ pozycjê.
 
 	void setSize(sf::Vector2f s); // Ustawia wymiary.
 	sf::Vector2f getSize() const; // Zwraca wymiary.
@@ -37,6 +31,5 @@ public:
 	void setOutlineColor(const sf::Color& color); // Ustawia kolor obrysu.
 	void setOutlineThickness(float thickness); // Ustawia gruboœæ obrysu.
 
-	// Zwraca globalne granice (do sprawdzania najechania mysz¹ i kolizji).
-	sf::FloatRect getGlobalBounds() const;
+	sf::FloatRect getGlobalBounds() const; // Zwraca globalne granice (do sprawdzania najechania mysz¹ i kolizji).
 };

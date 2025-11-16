@@ -1,31 +1,28 @@
-#include "Learner.h" // Do³¹czenie nag³ówka klasy Learner.
-#include <random> // Dla generowania liczb losowych (fallback i unikanie zaklinowania).
-#include <cmath> // Dla funkcji std::abs (wartoœæ bezwzglêdna).
-#include <array> // Dla kontenera std::array.
-#include <algorithm> // Dla funkcji std::shuffle.
+#include "Learner.h"
+#include <random>
+#include <cmath>
+#include <array>
+#include <algorithm>
 
-// Konstruktor klasy Learner.
 Learner::Learner(const std::string& texPath, sf::Vector2f startPos, float spd)
 	: Enemy(texPath, startPos, spd) // Wywo³anie konstruktora klasy bazowej Enemy.
 {
 }
 
-// ## Aktualizacja AI dla Learner'a
-void Learner::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
+
+void Learner::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)// Aktualizacja AI dla Learner.
 {
-	// Blok Fallback: Jeœli mapa lub pozycja gracza nie s¹ dostêpne, wykonaj prosty ruch losowy (jak Random).
-	if (!map || !playerPos.has_value()) {
-		// Statyczny generator liczb losowych (inicjalizowany raz).
-		static std::mt19937 rng{ std::random_device{}() };
+	if (!map || !playerPos.has_value()) { // Jeœli mapa lub pozycja gracza nie s¹ dostêpne, wykonaj prosty ruch losowy (jak Random).
+		static std::mt19937 rng{ std::random_device{}() }; // Statyczny generator liczb losowych (inicjalizowany raz).
 		changeDirTimer += dt; // Zwiêkszenie licznika czasu.
 
-		if (changeDirTimer > changeDirInterval) { // Czy nadszed³ czas na zmianê kierunku?
+		if (changeDirTimer > changeDirInterval) { // Nast¹pi³ czas na zmianê kierunku.
 			changeDirTimer = 0.f;
 			std::uniform_int_distribution<int> dist(0, 3); // Dystrybucja losowa dla 4 kierunków.
 			int d = dist(rng);
 
-			// Ustawienie nowego kierunku osiowego.
-			if (d == 0) direction = { 1.f, 0.f }; //prawo
+			// Ustawienie nowego kierunku
+			if (d == 0) direction = { 1.f, 0.f }; // prawo
 			else if (d == 1) direction = { -1.f, 0.f }; // lewo
 			else if (d == 2) direction = { 0.f, 1.f }; // dó³
 			else direction = { 0.f, -1.f }; //gora
@@ -39,58 +36,50 @@ void Learner::update(float dt, Map* map, std::optional<sf::Vector2f> playerPos)
 		return;
 	}
 
-	// --- G£ÓWNA LOGIKA AI (UCZENIE SIÊ) ---
 
-	// 1. OBLICZANIE MAPY CIEP£A
+	// OBLICZANIE MAPY CIEP£A
 
-	// Przekszta³cenie pozycji gracza na wspó³rzêdne kafelka (int x, int y).
-	int px = static_cast<int>(playerPos->x / map->getTileSize());
+	int px = static_cast<int>(playerPos->x / map->getTileSize()); // Przekszta³cenie pozycji gracza na wspó³rzêdne kafelka (int x, int y).
 	int py = static_cast<int>(playerPos->y / map->getTileSize());
 
 	auto key = std::make_pair(px, py);
-	visitHeatmap[key] += 4; //Zwiêksz "ciep³o" obecnego kafelka 4-krotnie (szybsza reakcja na nowe dane)
+	visitHeatmap[key] += 2; //Zwiêksz "ciep³o" obecnego kafelka 2-krotnie (szybsza reakcja na nowe dane)
 
-	// Starzenie danych: zmniejsz ciep³o wszystkich kafelków o 1.
-	for (auto& kv : visitHeatmap)
+	
+	for (auto& kv : visitHeatmap) // Starzenie danych: zmniejsz ciep³o wszystkich kafelków o 1.
 		kv.second = std::max(0, kv.second - 1); // Ciep³o nie mo¿e spaœæ poni¿ej 0.
 
 
-	// 2. WYBÓR NAJGORÊTSZEGO CELU
+	// WYBÓR NAJGORÊTSZEGO CELU
 
 	std::pair<int, int> best = key; // Domyœlnie obecna pozycja gracza.
 	int bestVal = visitHeatmap[key]; // Domyœlna wartoœæ ciep³a.
 
-	// Szukanie kafelka z maksymaln¹ wartoœci¹ ciep³a (czyli miejsca, gdzie gracz najczêœciej by³).
-	for (auto& kv : visitHeatmap) {
+	
+	for (auto& kv : visitHeatmap) { // Szukanie kafelka z maksymaln¹ wartoœci¹ ciep³a (czyli miejsca, gdzie gracz najczêœciej by³).
 		if (kv.second > bestVal) {
 			best = kv.first; // Najgorêtszy kafelek.
 			bestVal = kv.second;
 		}
 	}
 
-	// Obliczenie pozycji w pikselach dla najgorêtszego celu.
-	sf::Vector2f target(best.first * map->getTileSize(),
+	
+	sf::Vector2f target(best.first * map->getTileSize(), // Obliczenie pozycji w pikselach dla najgorêtszego celu.
 		best.second * map->getTileSize());
 
 	sf::Vector2f diff = target - position; // Wektor ró¿nicy (kierunek do celu).
 
-	// 3. RUCH TYLKO PROSTOPAD£Y W KIERUNKU CELU
+	// RUCH TYLKO PROSTOPAD£Y W KIERUNKU CELU
 
 	sf::Vector2f primaryDir{ 0.f, 0.f }; // Kierunek priorytetowy (np. X).
 	sf::Vector2f secondaryDir{ 0.f, 0.f }; // Kierunek drugorzêdny (np. Y).
 
-	// Sprawdzenie, który kierunek (X czy Y) jest silniejszy.
-	if (std::abs(diff.x) > std::abs(diff.y)) {
-		// Priorytet X: ruch w prawo/lewo.
-		primaryDir = { (diff.x > 0) ? 1.f : -1.f, 0.f };
-		// Drugorzêdny Y: ruch w górê/dó³.
-		secondaryDir = { 0.f, (diff.y > 0) ? 1.f : -1.f };
-	}
-	else {
-		// Priorytet Y: ruch w górê/dó³.
-		primaryDir = { 0.f, (diff.y > 0) ? 1.f : -1.f };
-		// Drugorzêdny X: ruch w prawo/lewo.
-		secondaryDir = { (diff.x > 0) ? 1.f : -1.f, 0.f };
+	if (std::abs(diff.x) > std::abs(diff.y)) { // Sprawdzenie, który kierunek (X czy Y) jest silniejszy.
+		primaryDir = { (diff.x > 0) ? 1.f : -1.f, 0.f }; // Priorytet X: ruch w prawo/lewo.
+		secondaryDir = { 0.f, (diff.y > 0) ? 1.f : -1.f }; // Drugorzêdny Y: ruch w górê/dó³.
+	} else {
+		primaryDir = { 0.f, (diff.y > 0) ? 1.f : -1.f }; // Priorytet Y: ruch w górê/dó³.
+		secondaryDir = { (diff.x > 0) ? 1.f : -1.f, 0.f }; // Drugorzêdny X: ruch w prawo/lewo.
 	}
 
 	sf::Vector2f try1 = position + primaryDir * speed * dt; // Próba ruchu priorytetowego.

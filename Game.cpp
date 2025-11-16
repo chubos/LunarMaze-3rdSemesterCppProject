@@ -1,22 +1,22 @@
-#include "Game.h" // Do³¹czenie pliku nag³ówkowego klasy Game.
-#include "Random.h" // Do³¹czenie klasy wroga: Losowy.
-#include "Chaser.h" // Do³¹czenie klasy wroga: Goni¹cy.
-#include "Learner.h" // Do³¹czenie klasy wroga: Ucz¹cy siê.
-#include <iostream> // Do operacji wejœcia/wyjœcia (np. b³êdy).
-#include <algorithm> // Dla funkcji std::min.
-#include <array> // Dla kontenera std::array.
+#include "Game.h"
+#include "Random.h"
+#include "Chaser.h"
+#include "Learner.h"
+#include <iostream>
+#include <algorithm>
+#include <array>
 
-// Helper: lighten color for hover
-// Funkcja pomocnicza: Rozjaœnia kolor dla efektu najechania mysz¹.
-static sf::Color lightenColor(const sf::Color& c, int amount = 30) {
+
+
+static sf::Color lightenColor(const sf::Color& c, int amount = 30) { // Funkcja pomocnicza: Rozjaœnia kolor dla efektu najechania mysz¹.
 	return sf::Color(
-		static_cast<sf::Uint8>(std::min(255, c.r + amount)), // Zwiêkszenie R (ograniczone do 255).
+		static_cast<sf::Uint8>(std::min(255, c.r + amount)), // Zwiêkszenie R.
 		static_cast<sf::Uint8>(std::min(255, c.g + amount)), // Zwiêkszenie G.
 		static_cast<sf::Uint8>(std::min(255, c.b + amount)), // Zwiêkszenie B.
 		c.a); // Kana³ alfa bez zmian.
 }
 
-// Definicje sta³ych poza konstruktorem, aby by³y dostêpne globalnie
+
 const float BTN_WIDTH = 220.f; // Szerokoœæ g³ównych przycisków menu.
 const float BTN_HEIGHT = 56.f; // Wysokoœæ g³ównych przycisków menu.
 const float BTN_RADIUS = 28.f; // Promieñ zaokr¹glenia dla g³ównych przycisków.
@@ -32,20 +32,19 @@ const float SUBMIT_BTN_RADIUS = 16.f; // Promieñ zaokr¹glenia dla przycisków wpr
 
 
 // Obliczanie pozycji startowych dla przycisków w Menu
-const float WINDOW_WIDTH = 2000.f; // Zak³adamy szerokoœæ okna z konstruktora (u¿ywane do obliczeñ statycznych).
-const float MENU_BUTTON_Y = 400.f; // Pozycja Y przycisków w Menu.
+const float WINDOW_WIDTH = 2000.f; // Szerokoœæ okna gry.
+const float MENU_BUTTON_Y = 500.f; // Pozycja Y przycisków w Menu.
 const float MENU_GAP = 20.f; // Odstêp miêdzy przyciskami w Menu.
 const float LB_POS_X = WINDOW_WIDTH / 2.0f + MENU_GAP; // Pozycja X dla przycisku Leaderboard (na prawo od œrodka).
 const float START_POS_X = LB_POS_X - MENU_GAP - BTN_WIDTH; // Pozycja X dla przycisku Start (na lewo od Leaderboard).
 
-// ## Konstruktor klasy Game
+
 Game::Game()
-// 1. Inicjalizacja sta³ych pól (SFML, Player, Leaderboard)
 	: window(sf::VideoMode(int(WINDOW_WIDTH), 1200), "Lunar Maze"), // Utworzenie okna.
 	player("assets/player3.png", { 100, 100 }, 150.f), // Inicjalizacja gracza.
 	leaderboard(10), // Inicjalizacja tablicy wyników.
 
-	// 2. Inicjalizacja przycisków (RoundedRectangle musz¹ byæ zainicjowane w LI)
+	// Inicjalizacja przycisków
 	leaderboardButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), // Przygotowanie przycisku Leaderboard.
 	startButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), // Przygotowanie przycisku Start.
 	backButton({ BACK_BTN_WIDTH, BACK_BTN_HEIGHT }, BACK_BTN_RADIUS), // Przygotowanie przycisku Powrót.
@@ -53,7 +52,7 @@ Game::Game()
 	submitButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS), // Przygotowanie przycisku ZatwierdŸ.
 	cancelButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS) // Przygotowanie przycisku Anuluj.
 {
-	map.loadFromFile("assets/map2.txt"); // £adowanie mapy.
+	map.loadFromFile("assets/map3.txt"); // £adowanie mapy.
 
 	player.scaleToTileSize(map.getTileSize()); // Skalowanie gracza do rozmiaru kafelka.
 
@@ -62,7 +61,7 @@ Game::Game()
 	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(750, 400), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(100, 600), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(400, 600), 90.f));
-	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(1200, 600), 90.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(1200, 700), 90.f));
 	enemies.push_back(std::make_unique<Random>("assets/ghost1.png", sf::Vector2f(1100, 700), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(100, 600), 90.f));
 	for (auto& enemy : enemies) enemy->scaleToTileSize(map.getTileSize());
@@ -70,9 +69,9 @@ Game::Game()
 	// Konfiguracja tekstu (wynik, tytu³, instrukcje, status).
 	font.loadFromFile("assets/font.ttf");
 	scoreText.setFont(font);
-	scoreText.setCharacterSize(20);
+	scoreText.setCharacterSize(35);
 	scoreText.setFillColor(sf::Color::White);
-	scoreText.setPosition(10, 10);
+	scoreText.setPosition(20, 10);
 
 	titleText.setFont(font);
 	titleText.setCharacterSize(120);
@@ -81,16 +80,16 @@ Game::Game()
 	auto titleBounds = titleText.getLocalBounds();
 	titleText.setOrigin(titleBounds.left + titleBounds.width / 2.0f,
 		titleBounds.top + titleBounds.height / 2.0f);
-	titleText.setPosition(window.getSize().x / 2.0f, 200.f);
+	titleText.setPosition(window.getSize().x / 2.0f, 300.f);
 
 	instructionText.setFont(font);
 	instructionText.setCharacterSize(30);
 	instructionText.setFillColor(sf::Color(200, 200, 255));
-	instructionText.setString("Collect all the crystals (*) while avoiding the drones!\nUse W/A/S/D to move your astronaut.");
+	instructionText.setString("Collect all the crystals while avoiding the ghosts!\n\t\t\t\tUse W/S/A/D to move your astronaut.");
 	auto instrBounds = instructionText.getLocalBounds();
 	instructionText.setOrigin(instrBounds.left + instrBounds.width / 2.0f,
 		instrBounds.top + instrBounds.height / 2.0f);
-	instructionText.setPosition(window.getSize().x / 2.0f, 320.f);
+	instructionText.setPosition(window.getSize().x / 2.0f, 420.f);
 
 
 	statusText.setFont(font);
@@ -98,13 +97,13 @@ Game::Game()
 	statusText.setFillColor(sf::Color::Yellow);
 	statusText.setPosition(200, 250);
 
-	// ### W£ASNOŒCI PRZYCISKÓW MENU ###
+	// W£ASNOŒCI PRZYCISKÓW MENU
 
 	// Przycisk Tabela Wyników (Leaderboard)
 	leaderboardButton.setFillColor(sf::Color(50, 50, 70));
 	leaderboardButton.setOutlineColor(sf::Color::White);
 	leaderboardButton.setOutlineThickness(BTN_OUTLINE);
-	leaderboardButton.setPosition({ LB_POS_X, MENU_BUTTON_Y }); // Ustawienie pozycji za pomoc¹ sta³ych.
+	leaderboardButton.setPosition({ LB_POS_X, MENU_BUTTON_Y}); // Ustawienie pozycji za pomoc¹ sta³ych.
 
 	leaderboardButtonText.setFont(font);
 	leaderboardButtonText.setCharacterSize(24);
@@ -128,7 +127,7 @@ Game::Game()
 	startButtonText.setOrigin(sbt.left + sbt.width / 2.f, sbt.top + sbt.height / 2.f);
 	startButtonText.setPosition(START_POS_X + BTN_WIDTH / 2.f, MENU_BUTTON_Y + BTN_HEIGHT / 2.f); // Pozycjonowanie tekstu.
 
-	// ### W£ASNOŒCI PRZYCISKÓW WIDOKU LEADERBOARD/ENTERNAME ###
+	// W£ASNOŒCI PRZYCISKÓW WIDOKU LEADERBOARD
 
 	// Przycisk Powrót (Back)
 	backButton.setFillColor(sf::Color(50, 50, 70));
@@ -137,7 +136,7 @@ Game::Game()
 	backButton.setPosition({ 20.f, 20.f }); // Pozycja w lewym górnym rogu.
 	backButtonText.setFont(font);
 	backButtonText.setCharacterSize(20);
-	backButtonText.setString("Back");
+	backButtonText.setString("Start");
 	auto bb = backButtonText.getLocalBounds();
 	backButtonText.setOrigin(bb.left + bb.width / 2.f, bb.top + bb.height / 2.f);
 	backButtonText.setPosition(backButton.getPosition().x + BACK_BTN_WIDTH / 2.f, backButton.getPosition().y + BACK_BTN_HEIGHT / 2.f);
@@ -152,9 +151,8 @@ Game::Game()
 	resetButtonText.setString("Reset scores");
 	auto rb = resetButtonText.getLocalBounds();
 	resetButtonText.setOrigin(rb.left + rb.width / 2.f, rb.top + rb.height / 2.f);
-	// Pozycja tekstu resetu jest ustawiana dynamicznie w draw().
 
-	// Elementy UI wprowadzania imienia
+	// Elementy wprowadzania imienia
 	inputPromptText.setFont(font);
 	inputPromptText.setCharacterSize(28);
 	inputPromptText.setFillColor(sf::Color::White);
@@ -188,7 +186,7 @@ Game::Game()
 	leaderboard.loadFromFile("scores.txt");
 
 	if (!backgroundTexture.loadFromFile("assets/background5.png"))
-		std::cerr << "Nie mozna zaladowac tla!\n";
+		std::cerr << "Nie mozna zaladowac tla.\n";
 	background.setTexture(backgroundTexture);
 	background.setScale(
 		window.getSize().x / background.getGlobalBounds().width,
@@ -199,7 +197,7 @@ Game::Game()
 	backgroundImageLoaded = true;
 
 	if (!music.openFromFile("assets/music.ogg"))
-		std::cerr << "Failed to load background music\n";
+		std::cerr << "Nie zaladowano muzyki.\n";
 	else {
 		music.setLoop(true);
 		music.setVolume(100);
@@ -207,28 +205,28 @@ Game::Game()
 	}
 
 	if (!collectBuffer.loadFromFile("assets/collect.wav"))
-		std::cerr << "Failed to load collect.wav\n";
+		std::cerr << "Nie zaladowano dzwieku collect.wav\n";
 	else {
 		collectSound.setBuffer(collectBuffer);
 		collectSound.setVolume(10.f);
 	}
 
 	if (!loseBuffer.loadFromFile("assets/lose.wav"))
-		std::cerr << "Failed to load lose.wav\n";
+		std::cerr << "Nie zaladowano dzwieku lose.wav\n";
 	else {
 		loseSound.setBuffer(loseBuffer);
 		loseSound.setVolume(30.f);
 	}
 
 	if (!winBuffer.loadFromFile("assets/win.wav"))
-		std::cerr << "Failed to load win.wav\n";
+		std::cerr << "Nie zaladowano dzwieku win.wav\n";
 	else {
 		winSound.setBuffer(winBuffer);
 		winSound.setVolume(30.f);
 	}
 }
 
-// ## G³ówna pêtla gry
+// G³ówna pêtla gry
 void Game::run() {
 	sf::Clock clock; // Zegar do mierzenia czasu klatki (dt).
 	while (window.isOpen()) {
@@ -238,7 +236,15 @@ void Game::run() {
 
 		if (inputDelay > 0.f) inputDelay -= dt; // Licznik opóŸnienia klawiatury.
 
-		titleTime += dt * titlePulseSpeed; // Aktualizacja czasu do efektu pulsowania/kursora.
+		titleTime += dt * titlePulseSpeed; // Aktualizacja czasu do efektu pulsowania kursora.
+
+		if (state == GameState::Menu) {
+			float alpha = 200 + std::sin(titleTime*1.5) * 50;
+			titleText.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(alpha)));
+
+			// Aktualizacja pozycji instrukcji (dla efektu lekkiego falowania)
+			instructionText.setPosition(window.getSize().x / 2.0f, 420.f + std::sin(titleTime * 1.5f) * 1.5);
+		}
 
 		if (state == GameState::Playing)
 			update(dt); // Aktualizacja logiki gry.
@@ -247,7 +253,7 @@ void Game::run() {
 	}
 }
 
-// ## Obs³uga zdarzeñ (wejœcie u¿ytkownika)
+// Obs³uga zdarzeñ (wejœcie u¿ytkownika)
 void Game::handleEvents()
 {
 	sf::Event event;
@@ -281,7 +287,7 @@ void Game::handleEvents()
 				continue;
 			}
 
-			if (state == GameState::EnterName && (event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Enter)) {
+			if (state == GameState::EnterName && (event.key.code == sf::Keyboard::Return)) {
 				submitHighScore(); // Zatwierdzenie imienia.
 				continue;
 			}
@@ -291,6 +297,13 @@ void Game::handleEvents()
 			}
 			if ((state == GameState::Win || state == GameState::GameOver) && event.key.code == sf::Keyboard::R) {
 				resetGame(); // Restart po zakoñczeniu.
+			}
+			if (event.key.code == sf::Keyboard::L) {
+				if (state == GameState::GameOver || state == GameState::Win) {
+					// Zmieñ stan na LeaderboardView
+					state = GameState::LeaderboardView;
+					continue;
+				}
 			}
 		}
 		// Obs³uga klikniêæ mysz¹.
@@ -321,18 +334,8 @@ void Game::handleEvents()
 	}
 }
 
-// ## Aktualizacja logiki gry
+// Aktualizacja logiki gry
 void Game::update(float dt) {
-
-	if (state == GameState::Menu) {
-		titleTime += dt * titlePulseSpeed;
-		float alpha = 200 + std::sin(titleTime) * 55;
-		titleText.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(alpha)));
-
-		instructionText.setPosition(window.getSize().x / 2.0f, 320.f + std::sin(titleTime * 1.5f) * 5);
-		return;
-	}
-
 
 	player.update(dt, &map); // Aktualizacja gracza.
 
@@ -340,10 +343,9 @@ void Game::update(float dt) {
 		collectSound.play(); // Zebranie kryszta³u.
 
 	for (auto& e : enemies)
-		e->update(dt, &map, player.getPosition()); // Aktualizacja wrogów (AI).
+		e->update(dt, &map, player.getPosition()); // Aktualizacja wrogów.
 
-	// Sprawdzenie kolizji gracza z wrogami.
-	for (auto& enemy : enemies) {
+	for (auto& enemy : enemies) { // Sprawdzenie kolizji gracza z wrogami.
 		if (player.getBounds().intersects(enemy->getBounds())) {
 			int finalScore = map.getScore();
 			if (leaderboard.isHighScore(finalScore)) {
@@ -351,13 +353,13 @@ void Game::update(float dt) {
 				inputName.clear();
 				inputText.setString(inputName);
 				prevEndState = GameState::GameOver;
-				state = GameState::EnterName; // High Score -> Wprowadzanie imienia.
+				state = GameState::EnterName; // High Score - Wprowadzanie imienia.
 				inputDelay = inputDelayDuration;
 				loseSound.play();
 				return;
 			}
 			state = GameState::GameOver; // Przegrana.
-			statusText.setString("Game Over! You were caught! Press R to restart.");
+			statusText.setString("Game Over! You were caught! Press R to restart. \n\t\t\t\t\t\t\tPress L for leaderboard.");
 			statusText.setFillColor(sf::Color::Red);
 			loseSound.play();
 			return;
@@ -379,13 +381,13 @@ void Game::update(float dt) {
 			inputName.clear();
 			inputText.setString(inputName);
 			prevEndState = GameState::Win;
-			state = GameState::EnterName; // High Score -> Wprowadzanie imienia.
+			state = GameState::EnterName; // High Score - Wprowadzanie imienia.
 			inputDelay = inputDelayDuration;
 			winSound.play();
 			return;
 		}
 		state = GameState::Win; // Wygrana.
-		statusText.setString("You Win! All crystals collected! Press R to restart.");
+		statusText.setString("You Win! All crystals collected! Press R to restart.\n\t\t\t\t\t\t\tPress L for leaderboard.");
 		statusText.setFillColor(sf::Color::Green);
 		winSound.play();
 		return;
@@ -394,7 +396,7 @@ void Game::update(float dt) {
 
 }
 
-// ## Rysowanie elementów na ekranie
+// Rysowanie elementów na ekranie
 void Game::draw() {
 	window.clear();
 	window.draw(background); // Rysowanie t³a.
@@ -426,7 +428,7 @@ void Game::draw() {
 		}
 		window.draw(instructionText);
 
-		// --- PRZYCISKI MENU ---
+		// PRZYCISKI MENU 
 		const sf::Color START_BASE_COLOR = sf::Color(40, 120, 180);
 		const sf::Color LB_BASE_COLOR = sf::Color(50, 50, 70);
 
@@ -475,7 +477,7 @@ void Game::draw() {
 		float modalH = std::min(700.f, winH * 0.75f);
 		sf::Vector2f modalPos((winW - modalW) * 0.5f, (winH - modalH) * 0.5f);
 
-		// --- STA£E WYMIARY PRZYCISKÓW ---
+		// STA£E WYMIARY PRZYCISKÓW
 		const float BACK_BTN_WIDTH = 160.f;
 		const float BACK_BTN_HEIGHT = 40.f;
 		const sf::Color BACK_BASE_COLOR = sf::Color(50, 50, 70);
@@ -562,7 +564,7 @@ void Game::draw() {
 		inputText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 20.f);
 		window.draw(inputText);
 
-		// --- PRZYCISKI WPROWADZANIA IMIENIA ---
+		// PRZYCISKI WPROWADZANIA IMIENIA
 		const float SUBMIT_BTN_WIDTH = 160.f;
 		const float SUBMIT_BTN_HEIGHT = 48.f;
 		const sf::Color SUBMIT_BASE_COLOR = sf::Color(40, 160, 40);
@@ -616,10 +618,10 @@ void Game::draw() {
 	window.display(); // Wyœwietlenie zawartoœci okna.
 }
 
-// ## Resetowanie stanu gry
+// Resetowanie stanu gry
 void Game::resetGame()
 {
-	map.loadFromFile("assets/map2.txt"); // Ponowne ³adowanie mapy.
+	map.loadFromFile("assets/map3.txt"); // Ponowne ³adowanie mapy.
 
 	player.setPosition({ 100, 100 }); // Reset pozycji gracza.
 	player.scaleToTileSize(map.getTileSize());
@@ -630,7 +632,7 @@ void Game::resetGame()
 	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(750, 400), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(100, 600), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(400, 600), 90.f));
-	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(1200, 600), 90.f));
+	enemies.push_back(std::make_unique<Learner>("assets/ghost3.png", sf::Vector2f(1200, 700), 90.f));
 	enemies.push_back(std::make_unique<Random>("assets/ghost1.png", sf::Vector2f(1100, 700), 90.f));
 	enemies.push_back(std::make_unique<Chaser>("assets/ghost4.png", sf::Vector2f(100, 600), 90.f));
 	for (auto& enemy : enemies) {
@@ -638,19 +640,17 @@ void Game::resetGame()
 		enemy->setPosition(enemy->getPosition());
 	}
 
-	scoreText.setString("Score: 0"); // Reset wyniku.
-	pendingScore = 0;
 	inputName.clear();
 	state = GameState::Playing; // Przejœcie do stanu gry.
 }
 
-// ## Przejœcie do widoku tabeli wyników
+// Przejœcie do widoku tabeli wyników
 void Game::openLeaderboard()
 {
 	state = GameState::LeaderboardView;
 }
 
-// ## Zapis wysokiego wyniku
+// Zapis wysokiego wyniku
 void Game::submitHighScore()
 {
 	if (inputName.empty()) inputName = "Anonymous";
@@ -659,7 +659,7 @@ void Game::submitHighScore()
 	state = GameState::LeaderboardView; // Po zapisie przejdŸ do tabeli wyników.
 }
 
-// ## Anulowanie wprowadzania wyniku
+// Anulowanie wprowadzania wyniku
 void Game::cancelHighScore()
 {
 	// Przywrócenie poprzedniego stanu koñcowego.
