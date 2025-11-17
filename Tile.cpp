@@ -2,17 +2,17 @@
 #include <iostream>
 
 namespace { // Statyczne zmienne przechowuj¹ce tekstury i stan ³adowania.
-	static sf::Texture wallTexture; // Tekstura œciany.
-	static sf::Texture floorTexture; // Tekstura pod³ogi.
-	static sf::Texture crystalTexture; // Tekstura kryszta³u.
-	static bool texturesLoaded = false; // Flaga, czy podjêto próbê za³adowania tekstur.
-	static bool wallTexOk = false; // Flaga, czy ³adowanie tekstury œciany siê powiod³o.
-	static bool floorTexOk = false; // Flaga, czy ³adowanie tekstury pod³ogi siê powiod³o.
-	static bool crystalTexOk = false; // Flaga, czy ³adowanie tekstury kryszta³u siê powiod³o.
+	static sf::Texture wallTexture;
+	static sf::Texture floorTexture;
+	static sf::Texture crystalTexture;
+	static bool texturesLoaded = false;
+	static bool wallTexOk = false;
+	static bool floorTexOk = false;
+	static bool crystalTexOk = false;
 
-	void ensureTileTexturesLoaded() 	// Funkcja ³adowania tekstur.
+	void ensureTileTexturesLoaded() 
 	{
-		if (texturesLoaded) return; // Jeœli ju¿ za³adowano, wyjdŸ.
+		if (texturesLoaded) return; 
 		
 		wallTexOk = wallTexture.loadFromFile("assets/wall.png"); // Próba ³adowania tekstur z plików i ustawienie flag sukcesu/b³êdu.
 		if (!wallTexOk) std::cerr << "Nie udalo sie zaladowac assets/wall.png\n";
@@ -21,15 +21,15 @@ namespace { // Statyczne zmienne przechowuj¹ce tekstury i stan ³adowania.
 		crystalTexOk = crystalTexture.loadFromFile("assets/crystal.png");
 		if (!crystalTexOk) std::cerr << "Nie udalo sie zaladowac assets/crystal.png\n";
 
-		texturesLoaded = true; // Ustaw flagê, ¿e ³adowanie zosta³o przeprowadzone.
+		texturesLoaded = true;
 	}
 }
 
 Tile::Tile(TileType type, sf::Vector2f position, float size)
-	: type(type), tileSize(size) // Inicjalizacja typu kafelka i rozmiaru.
+	: type(type), tileSize(size)
 {
-	shape.setSize({ size, size }); // Ustawienie rozmiaru kafelka.
-	shape.setPosition(position); // Ustawienie pozycji kafelka.
+	shape.setSize({ size, size }); 
+	shape.setPosition(position); 
 
 	if (type == TileType::Wall) // Ustawienie domyœlnego koloru (na wypadek braku tekstury).
 		shape.setFillColor(sf::Color(60, 60, 80));
@@ -38,34 +38,34 @@ Tile::Tile(TileType type, sf::Vector2f position, float size)
 	else if (type == TileType::Crystal)
 		shape.setFillColor(sf::Color(0, 200, 255));
 
-	ensureTileTexturesLoaded(); // Upewnij siê, ¿e tekstury s¹ za³adowane.
+	ensureTileTexturesLoaded(); 
 
-	if (type == TileType::Wall && wallTexOk) { // Przypisanie tekstury do sprite'a, jeœli ³adowanie siê powiod³o.
+	if (type == TileType::Wall && wallTexOk) { 
 		useTexture = true;
-		sprite.setTexture(wallTexture, true); // Przypisz teksturê œciany.
+		sprite.setTexture(wallTexture, true);
 	}
 	else if (type == TileType::Floor && floorTexOk) {
 		useTexture = true;
-		sprite.setTexture(floorTexture, true); // Przypisz teksturê pod³ogi.
+		sprite.setTexture(floorTexture, true); 
 	}
 	else if (type == TileType::Crystal && crystalTexOk) {
 		useTexture = true;
-		sprite.setTexture(crystalTexture, true); // Przypisz teksturê kryszta³u.
+		sprite.setTexture(crystalTexture, true); 
 	}
 	else {
-		useTexture = false; // U¿yj prostok¹ta, jeœli tekstura jest niedostêpna.
+		useTexture = false; 
 	}
 
 	
-	if (useTexture) { // Jeœli u¿ywamy tekstury, przeskaluj j¹, aby pasowa³a do rozmiaru kafelka.
+	if (useTexture) { 
 		auto texSize = sprite.getTexture()->getSize();
-		if (texSize.x == 0 || texSize.y == 0) { // Zabezpieczenie przed zerowym rozmiarem.
+		if (texSize.x == 0 || texSize.y == 0) {
 			useTexture = false;
 		}
 		else {
-			float sx = size / static_cast<float>(texSize.x); // Obliczenie skali X.
-			float sy = size / static_cast<float>(texSize.y); // Obliczenie skali Y.
-			sprite.setScale(sx, sy); // Zastosowanie skalowania.
+			float sx = size / static_cast<float>(texSize.x);
+			float sy = size / static_cast<float>(texSize.y);
+			sprite.setScale(sx, sy);
 			sprite.setOrigin(0.f, 0.f); // Ustawienie punktu pocz¹tkowego na górny lewy róg.
 			sprite.setPosition(position); // Ustawienie pozycji sprite.
 		}
@@ -73,44 +73,44 @@ Tile::Tile(TileType type, sf::Vector2f position, float size)
 }
 
 
-void Tile::draw(sf::RenderWindow& window, sf::Vector2f offset) { // Rysowanie kafelka
+void Tile::draw(sf::RenderWindow& window, sf::Vector2f offset) { 
 	sf::RenderStates states;
-	states.transform.translate(offset); // Dodanie przesuniêcia.
+	states.transform.translate(offset);
 
 	if (useTexture) {
 		window.draw(sprite, states); // Rysowanie sprite.
 	}
 	else {
-		window.draw(shape, states); // Rysowanie kszta³tu (prostok¹ta).
+		window.draw(shape, states); // Rysowanie prostok¹ta.
 	}
 }
 
 
-TileType Tile::getType() const // Pobieranie typu kafelka
+TileType Tile::getType() const 
 {
 	return type;
 }
 
 
-bool Tile::isCollected() const // Sprawdzenie, czy kafelek zosta³ zebrany
+bool Tile::isCollected() const
 {
 	return collected;
 }
 
 
-void Tile::collect() // Logika zbierania kryszta³u
+void Tile::collect()
 {
-	collected = true; // Ustaw flagê, ¿e zosta³ zebrany.
+	collected = true; 
 
 	if (type == TileType::Crystal) { 
-		type = TileType::Floor; // Zmieñ typ na Pod³ogê.
+		type = TileType::Floor; 
 
-		if (floorTexOk) { // Jeœli tekstura pod³ogi jest dostêpna
+		if (floorTexOk) { 
 			useTexture = true;
-			sprite.setTexture(floorTexture, true); // Zmieñ teksturê na pod³ogê.
+			sprite.setTexture(floorTexture, true); 
 
 			
-			auto texSize = sprite.getTexture()->getSize(); // Ponowne skalowanie tekstury.
+			auto texSize = sprite.getTexture()->getSize();
 			if (texSize.x > 0 && texSize.y > 0) {
 				sprite.setScale(tileSize / static_cast<float>(texSize.x),
 					tileSize / static_cast<float>(texSize.y));
@@ -118,15 +118,15 @@ void Tile::collect() // Logika zbierania kryszta³u
 				sprite.setPosition(shape.getPosition());
 			}
 		}
-		else { // Jeœli tekstura pod³ogi nie jest dostêpna
+		else { 
 			useTexture = false;
-			shape.setFillColor(sf::Color(20, 20, 40)); // Ustaw kolor Pod³ogi.
+			shape.setFillColor(sf::Color(20, 20, 40)); 
 		}
 	}
 }
 
 
-sf::FloatRect Tile::getBounds() const { // Pobieranie granic kafelka.
-	if (useTexture) return sprite.getGlobalBounds(); // Zwróæ granice na podstawie u¿ywanego obiektu.
+sf::FloatRect Tile::getBounds() const { 
+	if (useTexture) return sprite.getGlobalBounds(); 
 	return shape.getGlobalBounds();
 }

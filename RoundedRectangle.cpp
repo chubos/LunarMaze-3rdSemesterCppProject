@@ -2,7 +2,7 @@
 #include <cmath>
 
 RoundedRectangle::RoundedRectangle(sf::Vector2f size, float radius)
-	: size(size), radius(radius) // Inicjalizacja pól wymiaru i promienia.
+	: size(size), radius(radius)
 {
 }
 
@@ -13,7 +13,7 @@ void RoundedRectangle::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	float r = std::min(radius, std::min(size.x, size.y) / 2.f); // Ograniczenie promienia, aby nie przekroczy³ po³owy mniejszego wymiaru prostok¹ta.
 
 	// Logika rysowania obrysu
-	if (outlineThickness > 0.f) { // Jeœli gruboœæ > 0.
+	if (outlineThickness > 0.f) { 
 		float orad = r + outlineThickness; // Promieñ zewnêtrzny.
 		sf::Vector2f opos(position.x - outlineThickness, position.y - outlineThickness); // Pozycja górny-lewy róg obrysu.
 		sf::Vector2f osize(size.x + 2.f * outlineThickness, size.y + 2.f * outlineThickness); // Rozmiar ca³kowity obrysu.
@@ -71,22 +71,22 @@ void RoundedRectangle::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	right.setPosition(position.x + size.x - r, position.y + r); target.draw(right, states);
 }
 
-// Implementacja setterów/getterów
-void RoundedRectangle::setPosition(sf::Vector2f pos) { position = pos; } // Ustawia now¹ pozycjê.
-sf::Vector2f RoundedRectangle::getPosition() const { return position; } // Zwraca pozycjê.
 
-void RoundedRectangle::setSize(sf::Vector2f s) { size = s; } // Ustawia rozmiar.
-sf::Vector2f RoundedRectangle::getSize() const { return size; } // Zwraca rozmiar.
+void RoundedRectangle::setPosition(sf::Vector2f pos) { position = pos; } 
+sf::Vector2f RoundedRectangle::getPosition() const { return position; } 
 
-void RoundedRectangle::setRadius(float r) { radius = r; } // Ustawia promieñ.
+void RoundedRectangle::setSize(sf::Vector2f s) { size = s; } 
+sf::Vector2f RoundedRectangle::getSize() const { return size; }
 
-void RoundedRectangle::setFillColor(const sf::Color& color) { fillColor = color; } // Ustawia kolor wype³nienia.
-sf::Color RoundedRectangle::getFillColor() const { return fillColor; } // Zwraca kolor wype³nienia.
+void RoundedRectangle::setRadius(float r) { radius = r; } 
 
-void RoundedRectangle::setOutlineColor(const sf::Color& color) { outlineColor = color; } // Ustawia kolor obrysu.
-void RoundedRectangle::setOutlineThickness(float thickness) { outlineThickness = thickness; } // Ustawia gruboœæ obrysu.
+void RoundedRectangle::setFillColor(const sf::Color& color) { fillColor = color; } 
+sf::Color RoundedRectangle::getFillColor() const { return fillColor; } 
+
+void RoundedRectangle::setOutlineColor(const sf::Color& color) { outlineColor = color; } 
+void RoundedRectangle::setOutlineThickness(float thickness) { outlineThickness = thickness; } 
 
 sf::FloatRect RoundedRectangle::getGlobalBounds() const {
-	float t = outlineThickness; // Zwraca globaln¹ ramkê ograniczaj¹c¹ (obejmuje rozmiar i gruboœæ obrysu).
+	float t = outlineThickness; 
 	return sf::FloatRect(position.x - t, position.y - t, size.x + 2 * t, size.y + 2 * t); // Ramka jest powiêkszona o gruboœæ obrysu na ka¿dym brzegu.
 }

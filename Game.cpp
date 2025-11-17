@@ -8,53 +8,53 @@
 
 
 
-static sf::Color lightenColor(const sf::Color& c, int amount = 30) { // Funkcja pomocnicza: Rozjaœnia kolor dla efektu najechania mysz¹.
+static sf::Color lightenColor(const sf::Color& c, int amount = 30) { // Rozjaœnia kolor dla efektu najechania mysz¹.
 	return sf::Color(
-		static_cast<sf::Uint8>(std::min(255, c.r + amount)), // Zwiêkszenie R.
-		static_cast<sf::Uint8>(std::min(255, c.g + amount)), // Zwiêkszenie G.
-		static_cast<sf::Uint8>(std::min(255, c.b + amount)), // Zwiêkszenie B.
-		c.a); // Kana³ alfa bez zmian.
+		static_cast<sf::Uint8>(std::min(255, c.r + amount)),
+		static_cast<sf::Uint8>(std::min(255, c.g + amount)), 
+		static_cast<sf::Uint8>(std::min(255, c.b + amount)), 
+		c.a); 
 }
 
 
-const float BTN_WIDTH = 220.f; // Szerokoœæ g³ównych przycisków menu.
-const float BTN_HEIGHT = 56.f; // Wysokoœæ g³ównych przycisków menu.
-const float BTN_RADIUS = 28.f; // Promieñ zaokr¹glenia dla g³ównych przycisków.
-const float BTN_OUTLINE = 2.f; // Gruboœæ obrysu dla przycisków.
+const float BTN_WIDTH = 220.f;
+const float BTN_HEIGHT = 56.f;
+const float BTN_RADIUS = 28.f; 
+const float BTN_OUTLINE = 2.f;
 
-const float BACK_BTN_WIDTH = 160.f; // Szerokoœæ ma³ych przycisków (Back/Reset).
-const float BACK_BTN_HEIGHT = 40.f; // Wysokoœæ ma³ych przycisków.
-const float BACK_BTN_RADIUS = 12.f; // Promieñ zaokr¹glenia dla ma³ych przycisków.
+const float BACK_BTN_WIDTH = 160.f;
+const float BACK_BTN_HEIGHT = 40.f;
+const float BACK_BTN_RADIUS = 12.f; 
 
-const float SUBMIT_BTN_WIDTH = 160.f; // Szerokoœæ przycisków wprowadzania imienia.
-const float SUBMIT_BTN_HEIGHT = 48.f; // Wysokoœæ przycisków wprowadzania imienia.
-const float SUBMIT_BTN_RADIUS = 16.f; // Promieñ zaokr¹glenia dla przycisków wprowadzania imienia.
+const float SUBMIT_BTN_WIDTH = 160.f;
+const float SUBMIT_BTN_HEIGHT = 48.f;
+const float SUBMIT_BTN_RADIUS = 16.f; 
 
 
 // Obliczanie pozycji startowych dla przycisków w Menu
-const float WINDOW_WIDTH = 2000.f; // Szerokoœæ okna gry.
-const float MENU_BUTTON_Y = 500.f; // Pozycja Y przycisków w Menu.
-const float MENU_GAP = 20.f; // Odstêp miêdzy przyciskami w Menu.
-const float LB_POS_X = WINDOW_WIDTH / 2.0f + MENU_GAP; // Pozycja X dla przycisku Leaderboard (na prawo od œrodka).
-const float START_POS_X = LB_POS_X - MENU_GAP - BTN_WIDTH; // Pozycja X dla przycisku Start (na lewo od Leaderboard).
+const float WINDOW_WIDTH = 2000.f; 
+const float MENU_BUTTON_Y = 500.f; 
+const float MENU_GAP = 20.f; 
+const float LB_POS_X = WINDOW_WIDTH / 2.0f + MENU_GAP; 
+const float START_POS_X = LB_POS_X - MENU_GAP - BTN_WIDTH; 
 
 
 Game::Game()
-	: window(sf::VideoMode(int(WINDOW_WIDTH), 1200), "Lunar Maze"), // Utworzenie okna.
-	player("assets/player3.png", { 100, 100 }, 150.f), // Inicjalizacja gracza.
-	leaderboard(10), // Inicjalizacja tablicy wyników.
+	: window(sf::VideoMode(int(WINDOW_WIDTH), 1200), "Lunar Maze"), 
+	player("assets/player3.png", { 100, 100 }, 150.f), 
+	leaderboard(10),
 
 	// Inicjalizacja przycisków
-	leaderboardButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), // Przygotowanie przycisku Leaderboard.
-	startButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), // Przygotowanie przycisku Start.
-	backButton({ BACK_BTN_WIDTH, BACK_BTN_HEIGHT }, BACK_BTN_RADIUS), // Przygotowanie przycisku Powrót.
-	resetButton({ BACK_BTN_WIDTH, BACK_BTN_HEIGHT }, BACK_BTN_RADIUS), // Przygotowanie przycisku Reset.
-	submitButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS), // Przygotowanie przycisku ZatwierdŸ.
-	cancelButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS) // Przygotowanie przycisku Anuluj.
+	leaderboardButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), 
+	startButton({ BTN_WIDTH, BTN_HEIGHT }, BTN_RADIUS), 
+	backButton({ BACK_BTN_WIDTH, BACK_BTN_HEIGHT }, BACK_BTN_RADIUS), 
+	resetButton({ BACK_BTN_WIDTH, BACK_BTN_HEIGHT }, BACK_BTN_RADIUS), 
+	submitButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS), 
+	cancelButton({ SUBMIT_BTN_WIDTH, SUBMIT_BTN_HEIGHT }, SUBMIT_BTN_RADIUS) 
 {
-	map.loadFromFile("assets/map3.txt"); // £adowanie mapy.
+	map.loadFromFile("assets/map3.txt"); 
 
-	player.scaleToTileSize(map.getTileSize()); // Skalowanie gracza do rozmiaru kafelka.
+	player.scaleToTileSize(map.getTileSize()); 
 
 	// Inicjalizacja i skalowanie wrogów.
 	enemies.push_back(std::make_unique<Random>("assets/ghost1.png", sf::Vector2f(650, 200), 90.f));
@@ -103,7 +103,7 @@ Game::Game()
 	leaderboardButton.setFillColor(sf::Color(50, 50, 70));
 	leaderboardButton.setOutlineColor(sf::Color::White);
 	leaderboardButton.setOutlineThickness(BTN_OUTLINE);
-	leaderboardButton.setPosition({ LB_POS_X, MENU_BUTTON_Y}); // Ustawienie pozycji za pomoc¹ sta³ych.
+	leaderboardButton.setPosition({ LB_POS_X, MENU_BUTTON_Y});
 
 	leaderboardButtonText.setFont(font);
 	leaderboardButtonText.setCharacterSize(24);
@@ -111,13 +111,13 @@ Game::Game()
 	leaderboardButtonText.setString("Leaderboard");
 	auto lbBounds = leaderboardButtonText.getLocalBounds();
 	leaderboardButtonText.setOrigin(lbBounds.left + lbBounds.width / 2.f, lbBounds.top + lbBounds.height / 2.f);
-	leaderboardButtonText.setPosition(LB_POS_X + BTN_WIDTH / 2.f, MENU_BUTTON_Y + BTN_HEIGHT / 2.f); // Pozycjonowanie tekstu.
+	leaderboardButtonText.setPosition(LB_POS_X + BTN_WIDTH / 2.f, MENU_BUTTON_Y + BTN_HEIGHT / 2.f);
 
 	// Przycisk Start Game
 	startButton.setFillColor(sf::Color(40, 120, 180));
 	startButton.setOutlineColor(sf::Color::White);
 	startButton.setOutlineThickness(BTN_OUTLINE);
-	startButton.setPosition({ START_POS_X, MENU_BUTTON_Y }); // Ustawienie pozycji za pomoc¹ sta³ych.
+	startButton.setPosition({ START_POS_X, MENU_BUTTON_Y });
 
 	startButtonText.setFont(font);
 	startButtonText.setCharacterSize(24);
@@ -125,7 +125,7 @@ Game::Game()
 	startButtonText.setString("Start Game");
 	auto sbt = startButtonText.getLocalBounds();
 	startButtonText.setOrigin(sbt.left + sbt.width / 2.f, sbt.top + sbt.height / 2.f);
-	startButtonText.setPosition(START_POS_X + BTN_WIDTH / 2.f, MENU_BUTTON_Y + BTN_HEIGHT / 2.f); // Pozycjonowanie tekstu.
+	startButtonText.setPosition(START_POS_X + BTN_WIDTH / 2.f, MENU_BUTTON_Y + BTN_HEIGHT / 2.f);
 
 	// W£ASNOŒCI PRZYCISKÓW WIDOKU LEADERBOARD
 
@@ -133,7 +133,7 @@ Game::Game()
 	backButton.setFillColor(sf::Color(50, 50, 70));
 	backButton.setOutlineColor(sf::Color::White);
 	backButton.setOutlineThickness(BTN_OUTLINE);
-	backButton.setPosition({ 20.f, 20.f }); // Pozycja w lewym górnym rogu.
+	backButton.setPosition({ 20.f, 20.f }); 
 	backButtonText.setFont(font);
 	backButtonText.setCharacterSize(20);
 	backButtonText.setString("Start");
@@ -232,7 +232,7 @@ void Game::run() {
 	while (window.isOpen()) {
 		float dt = clock.restart().asSeconds(); // Czas klatki.
 
-		handleEvents(); // Obs³uga zdarzeñ.
+		handleEvents();
 
 		if (inputDelay > 0.f) inputDelay -= dt; // Licznik opóŸnienia klawiatury.
 
@@ -242,7 +242,7 @@ void Game::run() {
 			float alpha = 200.0f + std::sin(titleTime*1.5f) * 50.0f;
 			titleText.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(alpha)));
 
-			// Aktualizacja pozycji instrukcji (dla efektu lekkiego falowania)
+			// Efekt falowania
 			instructionText.setPosition(window.getSize().x / 2.0f, 420.f + std::sin(titleTime * 1.5f) * 1.8f);
 		}
 
@@ -253,18 +253,18 @@ void Game::run() {
 	}
 }
 
-// Obs³uga zdarzeñ (wejœcie u¿ytkownika)
+// Obs³uga zdarzeñ
 void Game::handleEvents()
 {
 	sf::Event event;
 	while (window.pollEvent(event)) {
 		if (event.type == sf::Event::Closed) {
-			window.close(); // Zamykanie okna.
+			window.close();
 		}
 
 		// Obs³uga wprowadzania tekstu (dla imienia).
 		if (state == GameState::EnterName && event.type == sf::Event::TextEntered) {
-			if (inputDelay > 0.f) continue; // Ignorowanie, jeœli jest opóŸnienie.
+			if (inputDelay > 0.f) continue;
 			if (event.text.unicode >= 32 && event.text.unicode < 128) { // Tylko znaki drukowalne.
 				if (inputName.size() < 20)
 					inputName.push_back(static_cast<char>(event.text.unicode));
@@ -283,24 +283,23 @@ void Game::handleEvents()
 			}
 
 			if (state == GameState::EnterName && event.key.code == sf::Keyboard::BackSpace) {
-				if (!inputName.empty()) { inputName.pop_back(); inputText.setString(inputName); } // Backspace.
+				if (!inputName.empty()) { inputName.pop_back(); inputText.setString(inputName); }
 				continue;
 			}
 
 			if (state == GameState::EnterName && (event.key.code == sf::Keyboard::Return)) {
-				submitHighScore(); // Zatwierdzenie imienia.
+				submitHighScore();
 				continue;
 			}
 
 			if (state == GameState::Menu && event.key.code == sf::Keyboard::Space) {
-				state = GameState::Playing; // Start gry ze spacji.
+				state = GameState::Playing; 
 			}
 			if ((state == GameState::Win || state == GameState::GameOver) && event.key.code == sf::Keyboard::R) {
-				resetGame(); // Restart po zakoñczeniu.
+				resetGame();
 			}
 			if (event.key.code == sf::Keyboard::L) {
 				if (state == GameState::GameOver || state == GameState::Win) {
-					// Zmieñ stan na LeaderboardView
 					state = GameState::LeaderboardView;
 					continue;
 				}
@@ -435,8 +434,8 @@ void Game::draw() {
 		// Rysowanie przycisku Start (z efektem hover).
 		sf::Color startFill = START_BASE_COLOR;
 		if (startButton.getGlobalBounds().contains(mousePos)) startFill = lightenColor(startFill, 30);
-		startButton.setFillColor(startFill); // Ustawienie koloru wype³nienia.
-		window.draw(startButton); // Rysowanie zaokr¹glonego prostok¹ta.
+		startButton.setFillColor(startFill);
+		window.draw(startButton);
 
 		// Rysowanie tekstu przycisku Start (z cieniem).
 		{
@@ -450,8 +449,8 @@ void Game::draw() {
 		// Rysowanie przycisku Leaderboard (z efektem hover).
 		sf::Color lbFill = LB_BASE_COLOR;
 		if (leaderboardButton.getGlobalBounds().contains(mousePos)) lbFill = lightenColor(lbFill, 30);
-		leaderboardButton.setFillColor(lbFill); // Ustawienie koloru wype³nienia.
-		window.draw(leaderboardButton); // Rysowanie zaokr¹glonego prostok¹ta.
+		leaderboardButton.setFillColor(lbFill); 
+		window.draw(leaderboardButton); 
 
 		// Rysowanie tekstu przycisku Leaderboard (z cieniem).
 		{

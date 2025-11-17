@@ -9,6 +9,6 @@ class Player : public Character
 public:
 	Player(const std::string& texturePath, sf::Vector2f startPosition, float speed);
 
-	void handleInput(); // Obs³uguje wejœcie u¿ytkownika (klawisze WASD).
+	void handleInput();
 	void update(float dt, Map* map = nullptr, std::optional<sf::Vector2f> playerPos = std::nullopt) override; // Aktualizuje stan gracza (ruch, kolizje, zbieranie przedmiotów).
 };

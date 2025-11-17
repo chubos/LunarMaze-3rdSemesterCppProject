@@ -3,24 +3,24 @@
 #include <vector>
 #include <algorithm>
 
-std::mt19937 Random::rng{ std::random_device{}() }; // Statyczna inicjalizacja generatora liczb losowych (rng)
+std::mt19937 Random::rng{ std::random_device{}() };
 
 Random::Random(const std::string& texPath, sf::Vector2f startPos, float spd)
-	: Enemy(texPath, startPos, spd) // Wywołanie konstruktora klasy bazowej Enemy.
+	: Enemy(texPath, startPos, spd)
 {
 }
 
 
-void Random::update(float dt, Map* map, std::optional<sf::Vector2f>) // Metoda  AI dla Losowego wroga.
+void Random::update(float dt, Map* map, std::optional<sf::Vector2f>)
 {
-	if (!map) return; // Jeśli brakuje mapy, przerwij.
+	if (!map) return;
 
-	changeDirTimer += dt; // Aktualizacja timera zmiany kierunku.
+	changeDirTimer += dt;
 
-	if (changeDirTimer > changeDirInterval) { // Losowa zmiana kierunku co ustalony czas.
-		changeDirTimer = 0.f; // Zresetowanie timera.
+	if (changeDirTimer > changeDirInterval) {
+		changeDirTimer = 0.f;
 
-		std::uniform_int_distribution<int> d(0, 3); // Wybór kierunku: góra/dół/lewo/prawo (0-3).
+		std::uniform_int_distribution<int> d(0, 3); // Wybór kierunku.
 		int dir = d(rng); // Wylosowanie nowego kierunku.
 
 		switch (dir) {
@@ -31,11 +31,11 @@ void Random::update(float dt, Map* map, std::optional<sf::Vector2f>) // Metoda  
 		}
 	}
 
-	sf::Vector2f newPos = position + direction * speed * dt; // Obliczenie docelowej pozycji.
+	sf::Vector2f newPos = position + direction * speed * dt;
 
-	if (canMoveTo(*map, newPos)) { // Sprawdzenie, czy ruch w obecnym kierunku jest możliwy.
-		position = newPos; // Wykonanie ruchu.
-		setPosition(position); // Aktualizacja pozycji duszka.
+	if (canMoveTo(*map, newPos)) { 
+		position = newPos;
+		setPosition(position);
 		return;
 	}
 
@@ -54,26 +54,26 @@ void Random::update(float dt, Map* map, std::optional<sf::Vector2f>) // Metoda  
 		perpendicularDirs.push_back({ -1.f, 0.f }); // Lewo.
 	}
 
-	std::shuffle(perpendicularDirs.begin(), perpendicularDirs.end(), rng); 	// Tasowanie kierunków, aby wybór był losowy.
+	std::shuffle(perpendicularDirs.begin(), perpendicularDirs.end(), rng);
 
 
-	for (auto& ndir : perpendicularDirs) { 	// Próba przejścia prostopadłego.
-		sf::Vector2f testPos = position + ndir * speed * dt; // Wyliczenie pozycji testowej.
-		if (canMoveTo(*map, testPos)) { // Jeśli ruch jest możliwy.
-			direction = ndir; // Zmień kierunek na nowy, prostopadły.
-			position = testPos; // Wykonaj ruch.
-			setPosition(position); // Aktualizacja duszka.
+	for (auto& ndir : perpendicularDirs) {
+		sf::Vector2f testPos = position + ndir * speed * dt;
+		if (canMoveTo(*map, testPos)) {
+			direction = ndir; 
+			position = testPos; 
+			setPosition(position); 
 			return;
 		}
 	}
 
 	// Jeśli prostopadłe nie działają, to odwrót (ruch o 180 stopni).
-	sf::Vector2f backDir = -direction; // Kierunek przeciwny do obecnego.
+	sf::Vector2f backDir = -direction;
 	sf::Vector2f backPos = position + backDir * speed * dt;
 	if (canMoveTo(*map, backPos)) {
-		direction = backDir; // Ustaw kierunek na przeciwny.
-		position = backPos; // Wykonaj ruch.
-		setPosition(position); // Aktualizacja duszka.
+		direction = backDir; 
+		position = backPos; 
+		setPosition(position); 
 		return;
 	}
 

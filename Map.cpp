@@ -3,80 +3,80 @@
 #include <iostream>
 
 bool Map::loadFromFile(const std::string& filename) {
-	std::ifstream file(filename); // Otwórz plik.
-	if (!file.is_open()) { // Sprawdzenie, czy plik zosta³ otwarty.
+	std::ifstream file(filename);
+	if (!file.is_open()) {
 		std::cerr << "Nie mozna otworzyc mapy: " << filename << "\n";
-		return false; // Zwróæ b³¹d, jeœli plik jest niedostêpny.
+		return false;
 	}
 
-	score = 0; // Resetuj stan mapy, w tym wynik, podczas ³adowania nowej mapy.
+	score = 0;
 	std::string line;
-	int y = 0; // Licznik wierszy (wspó³rzêdna Y).
+	int y = 0; // Licznik wierszy.
 	tiles.clear(); // Wyczyœæ wektor kafelków.
 
-	while (std::getline(file, line)) { // Czytaj plik linia po linii.
+	while (std::getline(file, line)) {
 		width = static_cast<int>(line.size()); // Ustaw szerokoœæ mapy na podstawie d³ugoœci linii.
-		for (int x = 0; x < width; x++) { // Iteruj przez znaki w linii (wspó³rzêdna X).
+		for (int x = 0; x < width; x++) {
 			char c = line[x];
 			sf::Vector2f position(x * tileSize, y * tileSize); // Oblicz pozycjê w pikselach.
 
 			// Tworzenie kafelka w zale¿noœci od znaku.
 			if (c == '#')
-				tiles.emplace_back(TileType::Wall, position, tileSize); // Œciana.
+				tiles.emplace_back(TileType::Wall, position, tileSize);
 			else if (c == '*')
-				tiles.emplace_back(TileType::Crystal, position, tileSize); // Kryszta³.
+				tiles.emplace_back(TileType::Crystal, position, tileSize);
 			else
-				tiles.emplace_back(TileType::Floor, position, tileSize); // Pod³oga.
+				tiles.emplace_back(TileType::Floor, position, tileSize);
 		}
-		y++; // PrzejdŸ do nastêpnego wiersza.
+		y++;
 	}
 	height = y; // Ustaw wysokoœæ mapy.
-	return true; // Pomyœlnie za³adowano.
+	return true;
 }
 
 
-void Map::draw(sf::RenderWindow& window, sf::Vector2f offset) { // Rysowanie mapy.
-	sf::RenderStates states; // Stan renderowania.
-	states.transform.translate(offset); // Zastosuj przesuniêcie mapy.
+void Map::draw(sf::RenderWindow& window, sf::Vector2f offset) {
+	sf::RenderStates states;
+	states.transform.translate(offset);
 
 	
-	for (auto& tile : tiles) // Wszyscy kafelki rysuj¹ siê same, otrzymuj¹c to samo przesuniêcie.
+	for (auto& tile : tiles)
 		tile.draw(window, offset);
 }
 
 
-const std::vector<Tile>& Map::getTiles() const // Pobieranie kafelków.
+const std::vector<Tile>& Map::getTiles() const
 {
-	return tiles; // Zwraca referencjê do wektora kafelków.
+	return tiles;
 }
 
 
-bool Map::isWallAt(float x, float y) const // Sprawdzenie, czy w danej pozycji znajduje siê œciana.
+bool Map::isWallAt(float x, float y) const 
 {
 	for (auto& tile : tiles) {
-		if (tile.getType() == TileType::Wall && tile.getBounds().contains(x, y)) // Czy kafelek to œciana i czy zawiera podane koordynaty.
+		if (tile.getType() == TileType::Wall && tile.getBounds().contains(x, y))
 			return true;
 	}
 	return false;
 }
 
 
-bool Map::isWallCollision(sf::FloatRect bounds) const // Sprawdzenie kolizji z dowoln¹ œcian¹.
+bool Map::isWallCollision(sf::FloatRect bounds) const
 {
 	for (const auto& tile : tiles) {
-		if (tile.getType() == TileType::Wall && tile.getBounds().intersects(bounds)) // Czy kafelek to œciana i czy jego granice przecinaj¹ siê z podanym prostok¹tem.
+		if (tile.getType() == TileType::Wall && tile.getBounds().intersects(bounds))
 			return true;
 	}
 	return false;
 }
 
 
-bool Map::collectCrystalAt(sf::FloatRect bounds) // Zbieranie kryszta³u w danym obszarze
+bool Map::collectCrystalAt(sf::FloatRect bounds)
 {
 	for (auto& tile : tiles) {
-		if (tile.getType() == TileType::Crystal && !tile.isCollected() && tile.getBounds().intersects(bounds)) { // Czy kafelek to kryszta³, czy nie zosta³ ju¿ zebrany, czy granice siê przecinaj¹.
-			tile.collect(); // Oznacz kafelek jako zebrany.
-			score += 10; // Dodaj punkty.
+		if (tile.getType() == TileType::Crystal && !tile.isCollected() && tile.getBounds().intersects(bounds)) {
+			tile.collect();
+			score += 10;
 			return true;
 		}
 	}
@@ -85,5 +85,5 @@ bool Map::collectCrystalAt(sf::FloatRect bounds) // Zbieranie kryszta³u w danym 
 
 int Map::getScore() const
 {
-	return score; // Zwróæ aktualny wynik.
+	return score;
 }

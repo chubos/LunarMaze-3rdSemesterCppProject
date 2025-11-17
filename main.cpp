@@ -2,6 +2,6 @@
 
 int main() {
 	Game game; // Utworzenie instancji klasy Game.
-	game.run(); // Uruchomienie g³ównej pêtli gry.
+	game.run();
 	return 0;
 }
